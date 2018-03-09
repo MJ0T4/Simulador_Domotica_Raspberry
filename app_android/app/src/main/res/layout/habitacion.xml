@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:background="#1075ce">
+
+    <ImageView
+        android:id="@+id/imagenHabitacion"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        app:srcCompat="@drawable/hab" />
+
+    <TextView
+        android:id="@+id/tvHabitacion"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="26dp"
+        android:layout_toEndOf="@+id/imagenHabitacion"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="#FFFFFF"></View>
+
+</RelativeLayout>

@@ -1,8 +1,12 @@
 package mario.app_android;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.view.ContextMenu;
+import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,25 +16,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private CustomAdapter adapter;
+    private ListView lvHabitaciones;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        // Inicializamos la listView, el adaptador personalizado y lo asignamos
+        lvHabitaciones = findViewById(R.id.lvItems);
+        adapter = new CustomAdapter(getApplicationContext(),R.layout.habitacion);
+        lvHabitaciones.setAdapter(adapter);
+
+        // Registramos la ListView para que tengo un menú contextual
+        registerForContextMenu(lvHabitaciones);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -40,6 +49,21 @@ public class Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
+        MenuInflater inflater = getMenuInflater();
+        if(v.getId() == R.id.lvItems){
+
+            int mPosition = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+            // El título del menú contextual es el nombre del elemento de la ListView seleccionado
+            menu.setHeaderTitle(((Habitacion) adapter.getItem(mPosition)).getTv().getText());
+
+            inflater.inflate(R.menu.menu_listview, menu);
+        }
+        super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     @Override
@@ -54,24 +78,94 @@ public class Home extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if(item.getItemId() == R.id.add) {
+            AlertDialog.Builder dialogName = new AlertDialog.Builder(this);
+            dialogName.setTitle("Nombre de la habitación");
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setHint("Nombre");
+            input.setGravity(Gravity.CENTER_HORIZONTAL);
+            dialogName.setView(input);
+            dialogName.setIcon(R.drawable.ic_power_settings_new_black_18dp);
+            dialogName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    TextView tv = new TextView(getApplicationContext());
+                    tv.setText(input.getText().toString());
+                    adapter.add(new Habitacion(R.drawable.hab, tv));
+                    adapter.notifyDataSetChanged();
+                }
+            });
+            dialogName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            dialogName.show();
             return true;
         }
+        return super.onContextItemSelected(item);
+    }
 
-        return super.onOptionsItemSelected(item);
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()) {
+            case R.id.delete:
+                AlertDialog.Builder builderDelete = new AlertDialog.Builder(Home.this);
+                builderDelete.setTitle("¿Desea eliminar '"+((Habitacion) adapter.getItem(info.position)).getTv().getText().toString()+"' ?");
+                builderDelete.setIcon(R.drawable.ic_delete);
+                builderDelete.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.remove(adapter.getItem(info.position));
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+                builderDelete.show();
+                return true;
+            case R.id.changeName:
+                AlertDialog.Builder dialogChangeName = new AlertDialog.Builder(this);
+                dialogChangeName.setTitle("Nombre de la habitación");
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("Nombre");
+                input.setGravity(Gravity.CENTER_HORIZONTAL);
+                dialogChangeName.setView(input);
+                dialogChangeName.setIcon(R.drawable.ic_power_settings_new_black_18dp);
+                dialogChangeName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ((Habitacion) adapter.getItem(info.position)).getTv().setText(input.getText().toString());
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+                dialogChangeName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                dialogChangeName.show();
+                return true;
+            default:
+                    return super.onContextItemSelected(item);
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -98,4 +192,8 @@ public class Home extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
+
 }
