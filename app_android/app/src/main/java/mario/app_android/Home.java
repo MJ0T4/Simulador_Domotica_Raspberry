@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -85,20 +86,40 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.add) {
+            final int[] imagen = new int[1];
+            CharSequence[] estancias = {"Habitación","Salón","Cocina","Baño"};
             AlertDialog.Builder dialogName = new AlertDialog.Builder(this);
-            dialogName.setTitle("Nombre de la habitación");
+            dialogName.setTitle("Elige una estancia");
             final EditText input = new EditText(this);
             input.setInputType(InputType.TYPE_CLASS_TEXT);
-            input.setHint("Nombre");
+            input.setHint("Nombre de la estancia");
             input.setGravity(Gravity.CENTER_HORIZONTAL);
             dialogName.setView(input);
-            dialogName.setIcon(R.drawable.ic_power_settings_new_black_18dp);
+            dialogName.setSingleChoiceItems(estancias, -1, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case 0:
+                            imagen[0] = R.drawable.habitacion;
+                            break;
+                        case 1:
+                            imagen[0] = R.drawable.salon;
+                            break;
+                        case 2:
+                            imagen[0] = R.drawable.cocina;
+                            break;
+                        case 3:
+                            imagen[0] = R.drawable.wc;
+                            break;
+                    }
+                }
+            });
             dialogName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     TextView tv = new TextView(getApplicationContext());
                     tv.setText(input.getText().toString());
-                    adapter.add(new Habitacion(R.drawable.hab, tv));
+                    adapter.add(new Habitacion(imagen[0], tv));
                     adapter.notifyDataSetChanged();
                 }
             });

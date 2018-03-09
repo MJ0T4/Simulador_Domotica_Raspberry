@@ -7,12 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +20,11 @@ import java.util.List;
 public class CustomAdapter extends ArrayAdapter {
 
     private List lista = new ArrayList();
+    private int resource;
 
     public CustomAdapter(@NonNull Context context, int resource) {
         super(context, resource);
+        this.resource = resource;
     }
 
     @Override
@@ -58,7 +56,7 @@ public class CustomAdapter extends ArrayAdapter {
         DataHandler handler;
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = layoutInflater.inflate(R.layout.habitacion,parent,false);
+            row = layoutInflater.inflate(resource,parent,false);
             handler = new DataHandler();
             handler.imagenHabitacion = row.findViewById(R.id.imagenHabitacion);
             handler.tvHabitacion = row.findViewById(R.id.tvHabitacion);
@@ -67,8 +65,7 @@ public class CustomAdapter extends ArrayAdapter {
         else{
             handler = (DataHandler) row.getTag();
         }
-        Habitacion habitacion;
-        habitacion = (Habitacion) getItem(position);
+        Habitacion habitacion = (Habitacion) getItem(position);
         handler.tvHabitacion.setText(habitacion.getTv().getText());
         row.setLongClickable(true);
         handler.imagenHabitacion.setImageResource(habitacion.getImagenHabitación());
