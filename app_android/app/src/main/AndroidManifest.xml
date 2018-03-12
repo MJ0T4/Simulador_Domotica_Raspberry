@@ -19,6 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PlantillaLuces"
+            android:label="@string/title_activity_plantilla_luces"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".Home">
+        </activity>
     </application>
 
 </manifest>

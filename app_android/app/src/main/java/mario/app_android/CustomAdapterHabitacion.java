@@ -1,6 +1,7 @@
 package mario.app_android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -17,14 +18,16 @@ import java.util.List;
  * Created by Jabalaizer on 08/03/2018.
  */
 
-public class CustomAdapter extends ArrayAdapter {
+public class CustomAdapterHabitacion extends ArrayAdapter {
 
     private List lista = new ArrayList();
     private int resource;
+    private Context context;
 
-    public CustomAdapter(@NonNull Context context, int resource) {
+    public CustomAdapterHabitacion(@NonNull Context context, int resource) {
         super(context, resource);
         this.resource = resource;
+        this.context = context;
     }
 
     @Override
@@ -53,22 +56,30 @@ public class CustomAdapter extends ArrayAdapter {
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View row = convertView;
-        DataHandler handler;
+        final DataHandler handler;
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = layoutInflater.inflate(resource,parent,false);
             handler = new DataHandler();
             handler.imagenHabitacion = row.findViewById(R.id.imagenHabitacion);
-            handler.tvHabitacion = row.findViewById(R.id.tvHabitacion);
+            handler.tvHabitacion = row.findViewById(R.id.tvNombre);
             row.setTag(handler);
         }
         else{
             handler = (DataHandler) row.getTag();
         }
-        Habitacion habitacion = (Habitacion) getItem(position);
+        final Habitacion habitacion = (Habitacion) getItem(position);
         handler.tvHabitacion.setText(habitacion.getTv().getText());
-        row.setLongClickable(true);
         handler.imagenHabitacion.setImageResource(habitacion.getImagenHabitación());
+        row.setLongClickable(true);
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent siguiente = new Intent(context,PlantillaLuces.class);
+                siguiente.putExtra("idImagen",habitacion.getImagenHabitación());
+                context.startActivity(siguiente);
+            }
+        });
         return row;
     }
 

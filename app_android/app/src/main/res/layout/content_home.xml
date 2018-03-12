@@ -7,24 +7,25 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="mario.app_android.Home"
     tools:showIn="@layout/app_bar_home"
-    android:background="#000000">
-
+    android:background="@color/colorBlack">
 
     <TextView
-        android:id="@+id/titulo"
+        android:id="@+id/tituloHabitaciones"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:background="@color/colorWhite"
+        android:text="Estancias"
+        android:textColor="@color/colorBlack"
         android:textAlignment="center"
-        android:text="Habitaciones"
-        android:background="#FFFFFF"/>
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
     <ListView
         android:id="@+id/lvItems"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/titulo" >
+        android:layout_below="@+id/tituloHabitaciones" >
     </ListView>
 
 </RelativeLayout>

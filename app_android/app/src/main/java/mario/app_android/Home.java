@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private CustomAdapter adapter;
+    private CustomAdapterHabitacion adapter;
     private ListView lvHabitaciones;
 
     @Override
@@ -36,7 +36,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         // Inicializamos la listView, el adaptador personalizado y lo asignamos
         lvHabitaciones = findViewById(R.id.lvItems);
-        adapter = new CustomAdapter(getApplicationContext(),R.layout.habitacion);
+        adapter = new CustomAdapterHabitacion(getApplicationContext(),R.layout.habitacion);
         lvHabitaciones.setAdapter(adapter);
 
         // Registramos la ListView para que tengo un menú contextual
@@ -95,21 +95,26 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             input.setHint("Nombre de la estancia");
             input.setGravity(Gravity.CENTER_HORIZONTAL);
             dialogName.setView(input);
+            final TextView tv = new TextView(getApplicationContext());
             dialogName.setSingleChoiceItems(estancias, -1, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch (which){
                         case 0:
-                            imagen[0] = R.drawable.habitacion;
+                            imagen[0] = R.drawable.cama;
+                            tv.setText("Habitación");
                             break;
                         case 1:
                             imagen[0] = R.drawable.salon;
+                            tv.setText("Salón");
                             break;
                         case 2:
                             imagen[0] = R.drawable.cocina;
+                            tv.setText("Cocina");
                             break;
                         case 3:
                             imagen[0] = R.drawable.wc;
+                            tv.setText("Baño");
                             break;
                     }
                 }
@@ -117,10 +122,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             dialogName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    TextView tv = new TextView(getApplicationContext());
-                    tv.setText(input.getText().toString());
+                    if(imagen[0]!=0){
+                        if(input.getText().length()>0)
+                            tv.setText(input.getText().toString());
                     adapter.add(new Habitacion(imagen[0], tv));
                     adapter.notifyDataSetChanged();
+                    }else{
+                        Toast.makeText(getApplicationContext(),"No has seleccionado una estancia",Toast.LENGTH_LONG).show();
+                    }
                 }
             });
             dialogName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
@@ -145,30 +154,28 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 AlertDialog.Builder builderDelete = new AlertDialog.Builder(Home.this);
                 builderDelete.setTitle("¿Desea eliminar '"+((Habitacion) adapter.getItem(info.position)).getTv().getText().toString()+"' ?");
                 builderDelete.setIcon(R.drawable.ic_delete);
+                builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.remove(adapter.getItem(info.position));
+                    }
+                });
                 builderDelete.setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
-                builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        adapter.remove(adapter.getItem(info.position));
-                        adapter.notifyDataSetChanged();
-                    }
-                });
                 builderDelete.show();
                 return true;
             case R.id.changeName:
                 AlertDialog.Builder dialogChangeName = new AlertDialog.Builder(this);
-                dialogChangeName.setTitle("Nombre de la habitación");
+                dialogChangeName.setTitle("Nombre de la estancia");
                 final EditText input = new EditText(this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 input.setHint("Nombre");
                 input.setGravity(Gravity.CENTER_HORIZONTAL);
                 dialogChangeName.setView(input);
-                dialogChangeName.setIcon(R.drawable.ic_power_settings_new_black_18dp);
                 dialogChangeName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
