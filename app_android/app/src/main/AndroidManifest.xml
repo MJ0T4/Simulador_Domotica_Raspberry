@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mario.app_android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,9 +25,13 @@
         <activity
             android:name=".PlantillaLuces"
             android:label="@string/title_activity_plantilla_luces"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".Home">
-        </activity>
+            android:parentActivityName=".Home"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".Servidor"
+            android:label="Servidor"
+            android:parentActivityName=".Home"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

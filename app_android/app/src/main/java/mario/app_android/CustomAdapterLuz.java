@@ -48,11 +48,11 @@ public class CustomAdapterLuz extends ArrayAdapter {
         return this.lista.size();
     }
 
-    static class DataHandler {
-        ImageView img;
-        TextView tvNombreLuz;
-        TextView tvEstado;
-        Switch switchEstado;
+    private static class DataHandler {
+        private ImageView img;
+        private TextView tvNombreLuz;
+        private TextView tvEstado;
+        private Switch switchEstado;
     }
 
     @Override
@@ -87,15 +87,20 @@ public class CustomAdapterLuz extends ArrayAdapter {
         handler.switchEstado.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                BDSqlite db = new BDSqlite(context);
+                db.iniciarBD();
+                db.abrirBD();
                 Luz luz = (Luz) getItem(position);
                 if(isChecked){
                     luz.setEstado("Encendida");
                     luz.setImg(R.drawable.luzencendida);
                     luz.setSwitchEstado(true);
+                    db.cambiarEstado(luz.getEstancia(), luz.getNombre(),1);
                 }else{
                     luz.setEstado("Apagada");
                     luz.setImg(R.drawable.luzapagada2);
                     luz.setSwitchEstado(false);
+                    db.cambiarEstado(luz.getEstancia(), luz.getNombre(),0);
                 }
                 notifyDataSetChanged();
             }

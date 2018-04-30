@@ -18,11 +18,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class PlantillaLuces extends AppCompatActivity {
 
     private CustomAdapterLuz adapterLuz;
     private ListView lvLuz;
-    private int idImagen;
+    private String nombreEstancia;
+    private int contador = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +41,27 @@ public class PlantillaLuces extends AppCompatActivity {
         lvLuz.setAdapter(adapterLuz);
         registerForContextMenu(lvLuz);
         // Para próximos avances si tratamos de distinguir de donde vino
-        idImagen = (int) getIntent().getExtras().get("idImagen");
+        nombreEstancia = (String) getIntent().getExtras().get("nombreEstancia");
+
+        BDSqlite db = new BDSqlite(getApplicationContext());
+        db.iniciarBD();
+        db.abrirBD();
+        Toast.makeText(getApplicationContext(),String.valueOf(db.numeroElementos(nombreEstancia)),Toast.LENGTH_LONG).show();
+        for(int i=0;i<db.numeroElementos(nombreEstancia);i++){
+            contador++;
+            ArrayList fila = db.recuperarElemento(i,nombreEstancia);
+            String texto = "Apagada";
+            Boolean estado = false;
+            int imagen = R.drawable.luzapagada2;
+            if(((Integer) fila.get(1))==1){
+                texto = "Encendida";
+                estado = true;
+                imagen = R.drawable.luzencendida;
+            }
+            adapterLuz.add(new Luz(imagen,fila.get(0).toString(),texto,estado,nombreEstancia));
+            adapterLuz.notifyDataSetChanged();
+        }
+        db.cerrarBD();
     }
 
     @Override
@@ -69,13 +92,23 @@ public class PlantillaLuces extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if(imagen[0]!=0){
+                        contador++;
                         TextView tv = new TextView(getApplicationContext());
                         if(input.getText().length()>0)
                             tv.setText(input.getText().toString());
                         else
-                            tv.setText("Bombilla");
-                        adapterLuz.add(new Luz(imagen[0],tv.getText().toString(),"Apagada",false));
-                        adapterLuz.notifyDataSetChanged();
+                            tv.setText("Bombilla "+String.valueOf(contador));
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        if(!db.existeEsteElemento(nombreEstancia,tv.getText().toString())) {
+                            db.guardarElemento(nombreEstancia, tv.getText().toString(), 0);
+                            adapterLuz.add(new Luz(imagen[0], tv.getText().toString(), "Apagada", false, nombreEstancia));
+                            adapterLuz.notifyDataSetChanged();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Ya existe un elemento con ese mismo nombre",Toast.LENGTH_LONG).show();
+                        }
+                        db.cerrarBD();
                     }else{
                         Toast.makeText(getApplicationContext(),"No has seleccionado un elemento",Toast.LENGTH_LONG).show();
                 }
@@ -127,7 +160,13 @@ public class PlantillaLuces extends AppCompatActivity {
                 builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        db.eliminarElemento(nombreEstancia,((Luz) adapterLuz.getItem(info.position)).getNombre());
+                        db.cerrarBD();
                         adapterLuz.remove(adapterLuz.getItem(info.position));
+                        contador--;
                     }
                 });
                 builderDelete.show();
@@ -143,8 +182,18 @@ public class PlantillaLuces extends AppCompatActivity {
                 dialogChangeName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((Luz) adapterLuz.getItem(info.position)).setNombre(input.getText().toString());
-                        adapterLuz.notifyDataSetChanged();
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        if(!db.existeEsteElemento(nombreEstancia,input.getText().toString())) {
+                            db.cambiarNombreElemento(nombreEstancia, ((Luz) adapterLuz.getItem(info.position)).getNombre(), input.getText().toString());
+                            db.cerrarBD();
+                            ((Luz) adapterLuz.getItem(info.position)).setNombre(input.getText().toString());
+                            adapterLuz.notifyDataSetChanged();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Ya existe un elemento con ese mismo nombre",Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 });
                 dialogChangeName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {

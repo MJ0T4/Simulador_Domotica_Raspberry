@@ -18,13 +18,13 @@ import java.util.List;
  * Created by Jabalaizer on 08/03/2018.
  */
 
-public class CustomAdapterHabitacion extends ArrayAdapter {
+public class CustomAdapterEstancia extends ArrayAdapter {
 
-    private List lista = new ArrayList();
     private int resource;
     private Context context;
+    private List lista = new ArrayList();
 
-    public CustomAdapterHabitacion(@NonNull Context context, int resource) {
+    public CustomAdapterEstancia(@NonNull Context context, int resource) {
         super(context, resource);
         this.resource = resource;
         this.context = context;
@@ -34,11 +34,7 @@ public class CustomAdapterHabitacion extends ArrayAdapter {
     public void add(@Nullable Object object) {
         super.add(object);
         lista.add(object);
-    }
-
-    @Override
-    public int getCount() {
-        return this.lista.size();
+        notifyDataSetChanged();
     }
 
     @Nullable
@@ -47,9 +43,20 @@ public class CustomAdapterHabitacion extends ArrayAdapter {
         return this.lista.get(position);
     }
 
-    static class DataHandler {
-        ImageView imagenHabitacion;
-        TextView tvHabitacion;
+    private static class DataHandler {
+        private ImageView imagenEstancia;
+        private TextView tvEstancia;
+    }
+
+    @Override
+    public int getCount() {
+        return this.lista.size();
+    }
+
+    @Override
+    public void remove(@Nullable Object object) {
+        lista.remove(object);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -61,32 +68,26 @@ public class CustomAdapterHabitacion extends ArrayAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = layoutInflater.inflate(resource,parent,false);
             handler = new DataHandler();
-            handler.imagenHabitacion = row.findViewById(R.id.imagenHabitacion);
-            handler.tvHabitacion = row.findViewById(R.id.tvNombre);
+            handler.imagenEstancia = row.findViewById(R.id.imagenHabitacion);
+            handler.tvEstancia = row.findViewById(R.id.tvNombre);
             row.setTag(handler);
         }
         else{
             handler = (DataHandler) row.getTag();
         }
         final Habitacion habitacion = (Habitacion) getItem(position);
-        handler.tvHabitacion.setText(habitacion.getTv().getText());
-        handler.imagenHabitacion.setImageResource(habitacion.getImagenHabitación());
+        handler.tvEstancia.setText(habitacion.getTv().getText());
+        handler.imagenEstancia.setImageResource(habitacion.getImagenHabitacion());
         row.setLongClickable(true);
         row.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent siguiente = new Intent(context,PlantillaLuces.class);
-                siguiente.putExtra("idImagen",habitacion.getImagenHabitación());
+                siguiente.putExtra("nombreEstancia",habitacion.getTv().getText().toString());
                 context.startActivity(siguiente);
             }
         });
         return row;
-    }
-
-    @Override
-    public void remove(@Nullable Object object) {
-        lista.remove(object);
-        notifyDataSetChanged();
     }
 
 }

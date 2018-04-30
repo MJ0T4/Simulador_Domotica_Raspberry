@@ -10,12 +10,14 @@ public class Luz {
     private String nombre;
     private String estado;
     private Boolean switchEstado;
+    private String estancia;
 
-    public Luz (int img, String nombre, String estado, Boolean switchEstado){
+    public Luz (int img, String nombre, String estado, boolean switchEstado, String estancia){
         this.img = img;
         this.nombre = nombre;
         this.estado = estado;
         this.switchEstado = switchEstado;
+        this.estancia = estancia;
     }
 
     public int getImg() {
@@ -48,5 +50,9 @@ public class Luz {
 
     public void setSwitchEstado(Boolean switchEstado) {
         this.switchEstado = switchEstado;
+    }
+
+    public String getEstancia() {
+        return estancia;
     }
 }

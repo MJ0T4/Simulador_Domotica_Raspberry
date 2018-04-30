@@ -1,7 +1,10 @@
 package mario.app_android;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.ContextMenu;
@@ -22,10 +25,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private CustomAdapterHabitacion adapter;
+    private CustomAdapterEstancia adapter;
     private ListView lvHabitaciones;
+    private Handler handler;
+    private RecepcionSocket recepcionSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +43,58 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         // Inicializamos la listView, el adaptador personalizado y lo asignamos
         lvHabitaciones = findViewById(R.id.lvItems);
-        adapter = new CustomAdapterHabitacion(getApplicationContext(),R.layout.habitacion);
+        adapter = new CustomAdapterEstancia(getApplicationContext(),R.layout.habitacion);
         lvHabitaciones.setAdapter(adapter);
 
         // Registramos la ListView para que tengo un menú contextual
         registerForContextMenu(lvHabitaciones);
+
+        // Abrimos la recepción de mensajes
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        BDSqlite db = new BDSqlite(getApplicationContext());
+        db.iniciarBD();
+        db.abrirBD();
+        ArrayList datosServidor = db.recuperarDatosServidor();
+        recepcionSocket = RecepcionSocket.getInstance(this,handler);
+        if(recepcionSocket.getSocket()==null || recepcionSocket.getSocket().isClosed()) {
+            if (!datosServidor.get(0).toString().equals("IP")) {
+                Toast.makeText(getApplicationContext(),datosServidor.get(0).toString(),Toast.LENGTH_LONG).show();
+                Thread hilo = new Thread(recepcionSocket);
+                hilo.start();
+            } else {
+                Toast.makeText(getApplicationContext(), "No se ha conectar al servidor, compruebe los datos introducidos", Toast.LENGTH_LONG).show();
+            }
+        }
+        if(db.numeroEstancias()!=0)
+            for(int i = 0; i < db.numeroEstancias();i++){
+                ArrayList fila = db.recuperarEstancia(i);
+                TextView tv = new TextView(getApplicationContext());
+                switch(Integer.valueOf(fila.get(0).toString())){
+                    case 0:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.cama, tv));
+                        break;
+                    case 1:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.salon, tv));
+                        break;
+                    case 2:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.cocina, tv));
+                        break;
+                    case 3:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.wc, tv));
+                        break;
+                }
+            }
+        db.cerrarBD();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -86,7 +140,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.add) {
-            final int[] imagen = new int[1];
+            final int[] imagen = new int[2];
             CharSequence[] estancias = {"Habitación","Salón","Cocina","Baño"};
             AlertDialog.Builder dialogName = new AlertDialog.Builder(this);
             dialogName.setTitle("Elige una estancia");
@@ -102,19 +156,23 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     switch (which){
                         case 0:
                             imagen[0] = R.drawable.cama;
-                            tv.setText("Habitación");
+                            imagen[1] = 0;
+                            tv.setText("Habitación ");
                             break;
                         case 1:
                             imagen[0] = R.drawable.salon;
-                            tv.setText("Salón");
+                            imagen[1] = 1;
+                            tv.setText("Salón ");
                             break;
                         case 2:
                             imagen[0] = R.drawable.cocina;
-                            tv.setText("Cocina");
+                            imagen[1] = 2;
+                            tv.setText("Cocina ");
                             break;
                         case 3:
                             imagen[0] = R.drawable.wc;
-                            tv.setText("Baño");
+                            imagen[1] = 3;
+                            tv.setText("Baño ");
                             break;
                     }
                 }
@@ -123,10 +181,24 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if(imagen[0]!=0){
-                        if(input.getText().length()>0)
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        tv.setText(tv.getText()+String.valueOf(db.recuperarContador(imagen[1])+1));
+                        if(input.getText().length()>0) {
                             tv.setText(input.getText().toString());
-                    adapter.add(new Habitacion(imagen[0], tv));
-                    adapter.notifyDataSetChanged();
+                        }
+                        if(!db.existeEstaEstancia(tv.getText().toString())) {
+                            adapter.add(new Habitacion(imagen[0], tv));
+                            db.guardarEstancia(imagen[1], tv.getText().toString());
+                            db.guardarContador(imagen[1],db.recuperarContador(imagen[1])+1);
+                            ArrayList datosServidor = db.recuperarDatosServidor();
+                            Conexion conexion = new Conexion(Home.this, tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                            conexion.execute();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
+                        }
+                        db.cerrarBD();
                     }else{
                         Toast.makeText(getApplicationContext(),"No has seleccionado una estancia",Toast.LENGTH_LONG).show();
                     }
@@ -157,6 +229,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        switch (((Habitacion) adapter.getItem(info.position)).getImagenHabitacion()){
+                            case R.drawable.cama:
+                                db.guardarContador(0,db.recuperarContador(0)-1);
+                                break;
+                            case R.drawable.salon:
+                                db.guardarContador(1,db.recuperarContador(1)-1);
+                                break;
+                            case R.drawable.cocina:
+                                db.guardarContador(2,db.recuperarContador(2)-1);
+                                break;
+                            case R.drawable.wc:
+                                db.guardarContador(3,db.recuperarContador(3)-1);
+                                break;
+                        }
+                        db.eliminarEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString());
+                        db.cerrarBD();
                         adapter.remove(adapter.getItem(info.position));
                     }
                 });
@@ -171,6 +262,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             case R.id.changeName:
                 AlertDialog.Builder dialogChangeName = new AlertDialog.Builder(this);
                 dialogChangeName.setTitle("Nombre de la estancia");
+                boolean insercionCorrecta = false;
                 final EditText input = new EditText(this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 input.setHint("Nombre");
@@ -179,8 +271,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 dialogChangeName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((Habitacion) adapter.getItem(info.position)).getTv().setText(input.getText().toString());
-                        adapter.notifyDataSetChanged();
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        if(!db.existeEstaEstancia(input.getText().toString())){
+                            db.cambiarNombreEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString(),input.getText().toString());
+                            ((Habitacion) adapter.getItem(info.position)).getTv().setText(input.getText().toString());
+                            adapter.notifyDataSetChanged();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
+                        }
+                        db.cerrarBD();
                     }
                 });
                 dialogChangeName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
@@ -204,10 +305,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
+        } else if (id == R.id.servidor) {
+            Intent siguiente = new Intent(Home.this,Servidor.class);
+            startActivity(siguiente);
         } else if (id == R.id.nav_slideshow) {
-
+            BDSqlite db = new BDSqlite(getApplicationContext());
+            db.iniciarBD();
+            db.abrirBD();
+            db.borrarBD();
+            db.cerrarBD();
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -215,13 +321,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         } else if (id == R.id.nav_send) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-
-
 }

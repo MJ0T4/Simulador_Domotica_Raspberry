@@ -11,20 +11,20 @@ import android.widget.TextView;
 
 public class Habitacion {
 
-    private int imagenHabitación;
+    private int imagenHabitacion;
     private TextView tv;
 
-    public Habitacion(int imagenHabitación, TextView tv){
-        this.setImagenHabitación(imagenHabitación);
+    public Habitacion(int imagenHabitacion, TextView tv){
+        this.setImagenHabitacion(imagenHabitacion);
         this.setTv(tv);
     }
 
-    public int getImagenHabitación() {
-        return imagenHabitación;
+    public int getImagenHabitacion() {
+        return imagenHabitacion;
     }
 
-    public void setImagenHabitación(int imagenHabitación) {
-        this.imagenHabitación = imagenHabitación;
+    public void setImagenHabitacion(int imagenHabitacion) {
+        this.imagenHabitacion = imagenHabitacion;
     }
 
     public TextView getTv() {
