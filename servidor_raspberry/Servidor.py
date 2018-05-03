@@ -9,13 +9,15 @@ class Servidor():
         self.ventana.configure(bg='black')
         self.centrarVentana(self.ventana, 600,600)
         self.bottom = Frame(self.ventana, bd=0, bg='gray')
-        self.bottom.pack(side=RIGHT, fill='both')
+        self.bottom.pack(side=RIGHT, fill='y')
         self.annadir = Button(self.bottom, text='Añadir Estancia', command=self.agregarEstancia, fg='white',bg='black')
         self.annadir.pack(fill='x')
-        self.cambiarNombre = Button(self.bottom, text='Cambiar nombre', command=self.cambiarNombreEstancia, fg='white', bg='black')
+        self.cambiarNombre = Button(self.bottom, text='Cambiar nombre', command=self.cambiarNombreEstancia, fg='white',
+                                    bg='black')
         self.cambiarNombre.pack(fill='x')
-        self.combo = ttk.Combobox(self.bottom)
-        self.combo.pack()
+        self.eliminar = Button(self.bottom, text='Eliminar Estancia', command=self.eliminarEstancia, fg='white',
+                                    bg='black')
+        self.eliminar.pack(fill='x')
         self.notebook = ttk.Notebook(self.ventana)
         self.notebook.pack(fill='both', expand='yes')
         self.ventana.mainloop()
@@ -67,7 +69,7 @@ class Servidor():
             Button(self.estancia, text='Cambiar nombre', command=self.cambiarNombrePestanna).pack()
             self.ventana.wait_window(self.estancia)
         else:
-            messagebox.showinfo('Error','No existe ninguna estancia para modificar su nombre')
+            messagebox.showerror('Error','No existe ninguna estancia para modificar su nombre')
 
     def cambiarNombrePestanna(self):
         nombre = self.recogerNombre.get()
@@ -75,6 +77,14 @@ class Servidor():
         if (nombre != ''):
             self.notebook.tab('current', text=nombre)
         self.recogerNombre.delete(0,'end') # Limpia el cajón
+
+    def eliminarEstancia(self):
+        if(len(self.notebook.tabs())>0):
+            nombre = self.notebook.tab('current','text')
+            if messagebox.askokcancel(title='Comprobación',message='¿Estás seguro de que deseas eliminar la estancia %s?' % (nombre)):
+                self.notebook.forget('current')
+        else:
+            messagebox.showerror('Error','No existe ninguna estancia para eliminar')
 
 # Se define la función main() que es en realidad la que indica
 # el comienzo del programa. Dentro de ella se crea el objeto
