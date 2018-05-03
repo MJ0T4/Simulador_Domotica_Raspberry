@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 class Servidor():
     def __init__(self):
@@ -11,6 +12,8 @@ class Servidor():
         self.bottom.pack(side=RIGHT, fill='both')
         self.annadir = Button(self.bottom, text='Añadir Estancia', command=self.agregarEstancia, fg='white',bg='black')
         self.annadir.pack(fill='x')
+        self.cambiarNombre = Button(self.bottom, text='Cambiar nombre', command=self.cambiarNombreEstancia, fg='white', bg='black')
+        self.cambiarNombre.pack(fill='x')
         self.combo = ttk.Combobox(self.bottom)
         self.combo.pack()
         self.notebook = ttk.Notebook(self.ventana)
@@ -49,6 +52,30 @@ class Servidor():
             self.notebook.add(estancia, text=nombre)
         self.recogerNombre.delete(0,'end') # Limpia el cajón
         self.estancia.destroy()
+
+    def cambiarNombreEstancia(self):
+        if(len(self.notebook.tabs())>0):
+            self.estancia = Toplevel(self.ventana)
+            width = self.ventana.winfo_width() + (self.ventana.winfo_screenwidth() / 2) - (self.ventana.winfo_width() / 2)
+            height = (self.ventana.winfo_screenheight() / 2) - (self.ventana.winfo_height() / 2)
+            self.estancia.geometry('200x250+%d+%d' % (width, height))
+            self.estancia.title('Cambiar nombre estancia')
+            nombre = Label(self.estancia, text='Nuevo nombre', width=30)
+            nombre.pack()
+            self.recogerNombre = Entry(self.estancia, width=30)
+            self.recogerNombre.pack()
+            Button(self.estancia, text='Cambiar nombre', command=self.cambiarNombrePestanna).pack()
+            self.ventana.wait_window(self.estancia)
+        else:
+            messagebox.showinfo('Error','No existe ninguna estancia para modificar su nombre')
+
+    def cambiarNombrePestanna(self):
+        nombre = self.recogerNombre.get()
+        estancia = Frame(self.notebook)
+        if (nombre != ''):
+            self.notebook.tab('current', text=nombre)
+        self.recogerNombre.delete(0,'end') # Limpia el cajón
+
 # Se define la función main() que es en realidad la que indica
 # el comienzo del programa. Dentro de ella se crea el objeto
 # aplicación 'miServidor' basado en la clase 'Servidor':
