@@ -118,6 +118,7 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
         ContentValues valores = new ContentValues();
         String [] args = new String [] {nombre};
         db.delete("estancias","nombre=?",args);
+        db.delete("elementos","estancia=?",args);
     }
 
     @Override

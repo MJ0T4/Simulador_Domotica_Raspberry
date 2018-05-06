@@ -193,7 +193,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             db.guardarEstancia(imagen[1], tv.getText().toString());
                             db.guardarContador(imagen[1],db.recuperarContador(imagen[1])+1);
                             ArrayList datosServidor = db.recuperarDatosServidor();
-                            Conexion conexion = new Conexion(Home.this, tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                            Conexion conexion = new Conexion(Home.this, "+E"+tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
                             conexion.execute();
                         }else{
                             Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
@@ -247,6 +247,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 break;
                         }
                         db.eliminarEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString());
+                        ArrayList datosServidor = db.recuperarDatosServidor();
+                        Conexion conexion = new Conexion(Home.this, "-E"+String.valueOf(info.position), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                        conexion.execute();
                         db.cerrarBD();
                         adapter.remove(adapter.getItem(info.position));
                     }
@@ -278,6 +281,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             db.cambiarNombreEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString(),input.getText().toString());
                             ((Habitacion) adapter.getItem(info.position)).getTv().setText(input.getText().toString());
                             adapter.notifyDataSetChanged();
+                            ArrayList datosServidor = db.recuperarDatosServidor();
+                            Conexion conexion = new Conexion(Home.this, "*E"+String.valueOf(info.position)+input.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                            conexion.execute();
                         }else{
                             Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
                         }

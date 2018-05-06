@@ -26,6 +26,7 @@ public class PlantillaLuces extends AppCompatActivity {
     private ListView lvLuz;
     private String nombreEstancia;
     private int contador = 0;
+    private int posicion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class PlantillaLuces extends AppCompatActivity {
         registerForContextMenu(lvLuz);
         // Para próximos avances si tratamos de distinguir de donde vino
         nombreEstancia = (String) getIntent().getExtras().get("nombreEstancia");
+        posicion = (Integer) getIntent().getExtras().get("posicion");
 
         BDSqlite db = new BDSqlite(getApplicationContext());
         db.iniciarBD();
@@ -103,6 +105,9 @@ public class PlantillaLuces extends AppCompatActivity {
                         db.abrirBD();
                         if(!db.existeEsteElemento(nombreEstancia,tv.getText().toString())) {
                             db.guardarElemento(nombreEstancia, tv.getText().toString(), 0);
+                            ArrayList datosServidor = db.recuperarDatosServidor();
+                            Conexion conexion = new Conexion(PlantillaLuces.this,"+B"+String.valueOf(posicion)+tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                            conexion.execute();
                             adapterLuz.add(new Luz(imagen[0], tv.getText().toString(), "Apagada", false, nombreEstancia));
                             adapterLuz.notifyDataSetChanged();
                         }else{
@@ -164,6 +169,9 @@ public class PlantillaLuces extends AppCompatActivity {
                         db.iniciarBD();
                         db.abrirBD();
                         db.eliminarElemento(nombreEstancia,((Luz) adapterLuz.getItem(info.position)).getNombre());
+                        ArrayList datosServidor = db.recuperarDatosServidor();
+                        Conexion conexion = new Conexion(PlantillaLuces.this,"-B"+String.valueOf(posicion)+String.valueOf(info.position), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                        conexion.execute();
                         db.cerrarBD();
                         adapterLuz.remove(adapterLuz.getItem(info.position));
                         contador--;
@@ -187,13 +195,15 @@ public class PlantillaLuces extends AppCompatActivity {
                         db.abrirBD();
                         if(!db.existeEsteElemento(nombreEstancia,input.getText().toString())) {
                             db.cambiarNombreElemento(nombreEstancia, ((Luz) adapterLuz.getItem(info.position)).getNombre(), input.getText().toString());
+                            ArrayList datosServidor = db.recuperarDatosServidor();
+                            Conexion conexion = new Conexion(PlantillaLuces.this,"*B"+String.valueOf(posicion)+String.valueOf(info.position)+input.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                            conexion.execute();
                             db.cerrarBD();
                             ((Luz) adapterLuz.getItem(info.position)).setNombre(input.getText().toString());
                             adapterLuz.notifyDataSetChanged();
                         }else{
                             Toast.makeText(getApplicationContext(),"Ya existe un elemento con ese mismo nombre",Toast.LENGTH_LONG).show();
                         }
-
                     }
                 });
                 dialogChangeName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {

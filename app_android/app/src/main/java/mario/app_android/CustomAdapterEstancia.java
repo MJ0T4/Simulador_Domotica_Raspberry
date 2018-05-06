@@ -84,6 +84,7 @@ public class CustomAdapterEstancia extends ArrayAdapter {
             public void onClick(View v) {
                 Intent siguiente = new Intent(context,PlantillaLuces.class);
                 siguiente.putExtra("nombreEstancia",habitacion.getTv().getText().toString());
+                siguiente.putExtra("posicion",position);
                 context.startActivity(siguiente);
             }
         });
