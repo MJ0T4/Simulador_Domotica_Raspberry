@@ -4,6 +4,7 @@ from tkinter import messagebox
 import socket
 import sys
 import threading
+from Database import Database
 
 HOST = "192.168.0.156"
 PORT = 8888
@@ -30,6 +31,19 @@ class Servidor():
         servidor = threading.Thread(target=self.iniciarServidor)
         servidor.start()
 
+        db = Database()
+        for i in range(db.numeroEstancias()):
+            estancia = db.recuperarEstancia(i)
+            contenedor = Frame(self.notebook)
+            self.notebook.add(child=contenedor, text=estancia[1])
+            self.framesPestannas.append(contenedor)
+            self.estancias[estancia[1]] = []
+            for j in range(db.numeroElementos(estancia[1])):
+                elemento = db.recuperarElemento(estancia[1],j)
+                label = Label(contenedor, text=elemento[1])
+                label.pack()
+                self.estancias[estancia[1]].append(label)
+        db.cerrarBD()
         self.ventana.mainloop()
 
     def centrarVentana(self, ventana, width, height):
@@ -129,45 +143,56 @@ class Servidor():
         self.ventanaSecundaria.destroy()
 
     def leerDatos(self, datos):
+        db = Database()
         if datos[0] == '+':
             if datos[1] == 'E':
                 contenedor = Frame(self.notebook)
-                self.notebook.add(child=contenedor,text=datos[2:])
+                self.notebook.add(child=contenedor,text=datos[3:])
                 self.framesPestannas.append(contenedor)
-                self.habitaciones[datos[2:]]=[]
+                self.estancias[datos[3:]]=[]
+                db.insertarEstancia(datos[2:3], datos[3:])
             else:
-                lista = self.habitaciones[self.notebook.tab(int(datos[2:3]),'text')]
+                lista = self.estancias[self.notebook.tab(int(datos[2:3]),'text')]
+                #imagen = PhotoImage(file="imagenes\luzapagada2.png")
                 label = Label(self.framesPestannas[int(datos[2:3])], text=datos[3:])
                 label.pack()
                 lista.append(label)
-                print(self.framesPestannas[int(datos[2:3])])
-                self.habitaciones[self.notebook.tab(datos[2:3],'text')] = lista
-                print(self.habitaciones[self.notebook.tab(datos[2:3],'text')])
+                self.estancias[self.notebook.tab(datos[2:3],'text')] = lista
+                db.insertarElemento(self.notebook.tab(int(datos[2:3]),'text'), datos[3:], 0)
         else:
             if datos[0] == '-':
                 if datos[1] == 'E':
-                    del self.habitaciones[self.notebook.tab(int(datos[2:]), 'text')]
+                    del self.estancias[self.notebook.tab(int(datos[2:]), 'text')]
                     del self.framesPestannas[int(datos[2:])]
+                    db.eliminarEstancia(self.notebook.tab(int(datos[2:]), 'text'))
                     self.notebook.forget(datos[2:])
                 else:
-                    lista = self.habitaciones[self.notebook.tab(int(datos[2:3]), 'text')]
+                    lista = self.estancias[self.notebook.tab(int(datos[2:3]), 'text')]
                     lista[int(datos[3:4])].destroy()
                     lista.remove(lista[int(datos[3:4])])
+                    db.eliminarElemento(self.notebook.tab(int(datos[2:3]), 'text'), int(datos[3:4]))
             else:
                 if datos[0] == '*':
                     if datos[1] == 'E':
-                        lista = self.habitaciones[self.notebook.tab(int(datos[2:3]), 'text')]
-                        self.habitaciones[datos[3:]]=lista
-                        del self.habitaciones[self.notebook.tab(int(datos[2:3]), 'text')]
-                        self.notebook.tab(int(datos[2:3]),text=datos[3:])
+                        lista = self.estancias[self.notebook.tab(int(datos[2:3]), 'text')]
+                        self.estancias[datos[3:]] = lista
+                        del self.estancias[self.notebook.tab(int(datos[2:3]), 'text')]
+                        db.actualizarEstancia(self.notebook.tab(int(datos[2:3]), 'text'), datos[3:])
+                        self.notebook.tab(int(datos[2:3]), text=datos[3:])
                     else:
-                        lista = self.habitaciones[self.notebook.tab(int(datos[2:3]), 'text')]
+                        lista = self.estancias[self.notebook.tab(int(datos[2:3]), 'text')]
                         label = lista[int(datos[3:4])]
+                        db.actualizarElemento(self.notebook.tab(int(datos[2:3]), 'text'), label['text'], datos[4:])
                         label['text'] = datos[4:]
+                else:
+                    if datos[0] == '#':
+                        lista = self.estancias[self.notebook.tab(int(datos[1]), 'text')]
+        db.cerrarBD()
+
 
     def iniciarServidor(self):
         self.framesPestannas = []
-        self.habitaciones = {}
+        self.estancias = {}
         # Servidor socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Socket creado correctamente")

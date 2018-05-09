@@ -193,8 +193,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             db.guardarEstancia(imagen[1], tv.getText().toString());
                             db.guardarContador(imagen[1],db.recuperarContador(imagen[1])+1);
                             ArrayList datosServidor = db.recuperarDatosServidor();
-                            Conexion conexion = new Conexion(Home.this, "+E"+tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
-                            conexion.execute();
+                            if(recepcionSocket.getSocket().isConnected() && !recepcionSocket.getSocket().isClosed()) {
+                                Conexion conexion = new Conexion(Home.this, "+E" + String.valueOf(imagen[1]) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                                conexion.execute();
+                            }else{
+                                Toast.makeText(getApplicationContext(),"No intenta enviar el mensaje", Toast.LENGTH_LONG).show();
+                            }
                         }else{
                             Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
                         }

@@ -110,7 +110,10 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
         ContentValues valores = new ContentValues();
         String [] args = new String [] {nombreAntiguo};
         valores.put("nombre", nombreNuevo);
-        db.update("estancias",valores,"nombre=?",args);
+        db.update("estancias", valores,"nombre=?",args);
+        valores.clear();
+        valores.put("estancia", nombreNuevo);
+        db.update("elementos", valores,"estancia=?",args);
     }
 
     @Override
