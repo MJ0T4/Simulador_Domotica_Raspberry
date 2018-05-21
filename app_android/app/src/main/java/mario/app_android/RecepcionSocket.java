@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -74,8 +75,10 @@ public class RecepcionSocket implements Runnable {
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            Log.d("Probando","Falla en UnknowHostException");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("Probando","Falla en IOException");
         }
     }
 

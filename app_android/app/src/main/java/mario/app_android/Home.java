@@ -20,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -139,83 +140,98 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.add) {
-            final int[] imagen = new int[2];
-            CharSequence[] estancias = {"Habitación","Salón","Cocina","Baño"};
-            AlertDialog.Builder dialogName = new AlertDialog.Builder(this);
-            dialogName.setTitle("Elige una estancia");
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            input.setHint("Nombre de la estancia");
-            input.setGravity(Gravity.CENTER_HORIZONTAL);
-            dialogName.setView(input);
-            final TextView tv = new TextView(getApplicationContext());
-            dialogName.setSingleChoiceItems(estancias, -1, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which){
-                        case 0:
-                            imagen[0] = R.drawable.cama;
-                            imagen[1] = 0;
-                            tv.setText("Habitación ");
-                            break;
-                        case 1:
-                            imagen[0] = R.drawable.salon;
-                            imagen[1] = 1;
-                            tv.setText("Salón ");
-                            break;
-                        case 2:
-                            imagen[0] = R.drawable.cocina;
-                            imagen[1] = 2;
-                            tv.setText("Cocina ");
-                            break;
-                        case 3:
-                            imagen[0] = R.drawable.wc;
-                            imagen[1] = 3;
-                            tv.setText("Baño ");
-                            break;
-                    }
-                }
-            });
-            dialogName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if(imagen[0]!=0){
-                        BDSqlite db = new BDSqlite(getApplicationContext());
-                        db.iniciarBD();
-                        db.abrirBD();
-                        tv.setText(tv.getText()+String.valueOf(db.recuperarContador(imagen[1])+1));
-                        if(input.getText().length()>0) {
-                            tv.setText(input.getText().toString());
+        if(recepcionSocket.getSocket()!= null && !recepcionSocket.getSocket().isClosed() && recepcionSocket.getSocket().isConnected()) {
+            if (item.getItemId() == R.id.add) {
+                final int[] imagen = new int[2];
+                CharSequence[] estancias = {"Habitación", "Salón", "Cocina", "Baño"};
+                AlertDialog.Builder dialogName = new AlertDialog.Builder(this);
+                dialogName.setTitle("Elige una estancia");
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("Nombre de la estancia");
+                input.setGravity(Gravity.CENTER_HORIZONTAL);
+                dialogName.setView(input);
+                final TextView tv = new TextView(getApplicationContext());
+                dialogName.setSingleChoiceItems(estancias, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                imagen[0] = R.drawable.cama;
+                                imagen[1] = 0;
+                                tv.setText("Habitación ");
+                                break;
+                            case 1:
+                                imagen[0] = R.drawable.salon;
+                                imagen[1] = 1;
+                                tv.setText("Salón ");
+                                break;
+                            case 2:
+                                imagen[0] = R.drawable.cocina;
+                                imagen[1] = 2;
+                                tv.setText("Cocina ");
+                                break;
+                            case 3:
+                                imagen[0] = R.drawable.wc;
+                                imagen[1] = 3;
+                                tv.setText("Baño ");
+                                break;
                         }
-                        if(!db.existeEstaEstancia(tv.getText().toString())) {
-                            adapter.add(new Habitacion(imagen[0], tv));
-                            db.guardarEstancia(imagen[1], tv.getText().toString());
-                            db.guardarContador(imagen[1],db.recuperarContador(imagen[1])+1);
-                            ArrayList datosServidor = db.recuperarDatosServidor();
-                            if(recepcionSocket.getSocket().isConnected() && !recepcionSocket.getSocket().isClosed()) {
-                                Conexion conexion = new Conexion(Home.this, "+E" + String.valueOf(imagen[1]) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
-                                conexion.execute();
-                            }else{
-                                Toast.makeText(getApplicationContext(),"No intenta enviar el mensaje", Toast.LENGTH_LONG).show();
+                    }
+                });
+                dialogName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (imagen[0] != 0) {
+                            BDSqlite db = new BDSqlite(getApplicationContext());
+                            db.iniciarBD();
+                            db.abrirBD();
+                            tv.setText(tv.getText() + String.valueOf(db.recuperarContador(imagen[1]) + 1));
+                            if (input.getText().length() > 0) {
+                                tv.setText(input.getText().toString());
                             }
-                        }else{
-                            Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
+                            if (!db.existeEstaEstancia(tv.getText().toString())) {
+                                adapter.add(new Habitacion(imagen[0], tv));
+                                db.guardarEstancia(imagen[1], tv.getText().toString());
+                                db.guardarContador(imagen[1], db.recuperarContador(imagen[1]) + 1);
+                                ArrayList datosServidor = db.recuperarDatosServidor();
+                                if (recepcionSocket.getSocket().isConnected() && !recepcionSocket.getSocket().isClosed()) {
+                                    Conexion conexion = new Conexion(Home.this, "+E" + String.valueOf(imagen[1]) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                                    conexion.execute();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "No intenta enviar el mensaje", Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Ya existe una estancia con ese mismo nombre", Toast.LENGTH_LONG).show();
+                            }
+                            db.cerrarBD();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No has seleccionado una estancia", Toast.LENGTH_LONG).show();
                         }
-                        db.cerrarBD();
-                    }else{
-                        Toast.makeText(getApplicationContext(),"No has seleccionado una estancia",Toast.LENGTH_LONG).show();
                     }
-                }
-            });
-            dialogName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                });
+                dialogName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                dialogName.show();
+                return true;
+            }
+        }else{
+            AlertDialog.Builder dialogServidor = new AlertDialog.Builder(this);
+            Button boton = new Button(Home.this);
+            boton.setText("Ir a la configuración del servidor");
+            boton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
+                public void onClick(View v) {
+                    Intent siguiente = new Intent(Home.this,Servidor.class);
+                    startActivity(siguiente);
                 }
             });
-            dialogName.show();
-            return true;
+            dialogServidor.setView(boton);
+            dialogServidor.show();
         }
         return super.onContextItemSelected(item);
     }
@@ -224,87 +240,102 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     public boolean onContextItemSelected(MenuItem item) {
 
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
-        switch (item.getItemId()) {
-            case R.id.delete:
-                AlertDialog.Builder builderDelete = new AlertDialog.Builder(Home.this);
-                builderDelete.setTitle("¿Desea eliminar '"+((Habitacion) adapter.getItem(info.position)).getTv().getText().toString()+"' ?");
-                builderDelete.setIcon(R.drawable.ic_delete);
-                builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        BDSqlite db = new BDSqlite(getApplicationContext());
-                        db.iniciarBD();
-                        db.abrirBD();
-                        switch (((Habitacion) adapter.getItem(info.position)).getImagenHabitacion()){
-                            case R.drawable.cama:
-                                db.guardarContador(0,db.recuperarContador(0)-1);
-                                break;
-                            case R.drawable.salon:
-                                db.guardarContador(1,db.recuperarContador(1)-1);
-                                break;
-                            case R.drawable.cocina:
-                                db.guardarContador(2,db.recuperarContador(2)-1);
-                                break;
-                            case R.drawable.wc:
-                                db.guardarContador(3,db.recuperarContador(3)-1);
-                                break;
-                        }
-                        db.eliminarEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString());
-                        ArrayList datosServidor = db.recuperarDatosServidor();
-                        Conexion conexion = new Conexion(Home.this, "-E"+String.valueOf(info.position), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
-                        conexion.execute();
-                        db.cerrarBD();
-                        adapter.remove(adapter.getItem(info.position));
-                    }
-                });
-                builderDelete.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builderDelete.show();
-                return true;
-            case R.id.changeName:
-                AlertDialog.Builder dialogChangeName = new AlertDialog.Builder(this);
-                dialogChangeName.setTitle("Nombre de la estancia");
-                boolean insercionCorrecta = false;
-                final EditText input = new EditText(this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                input.setHint("Nombre");
-                input.setGravity(Gravity.CENTER_HORIZONTAL);
-                dialogChangeName.setView(input);
-                dialogChangeName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        BDSqlite db = new BDSqlite(getApplicationContext());
-                        db.iniciarBD();
-                        db.abrirBD();
-                        if(!db.existeEstaEstancia(input.getText().toString())){
-                            db.cambiarNombreEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString(),input.getText().toString());
-                            ((Habitacion) adapter.getItem(info.position)).getTv().setText(input.getText().toString());
-                            adapter.notifyDataSetChanged();
+        if(recepcionSocket.getSocket()!= null && !recepcionSocket.getSocket().isClosed() && recepcionSocket.getSocket().isConnected()){
+            switch (item.getItemId()) {
+                case R.id.delete:
+                    AlertDialog.Builder builderDelete = new AlertDialog.Builder(Home.this);
+                    builderDelete.setTitle("¿Desea eliminar '" + ((Habitacion) adapter.getItem(info.position)).getTv().getText().toString() + "' ?");
+                    builderDelete.setIcon(R.drawable.ic_delete);
+                    builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            BDSqlite db = new BDSqlite(getApplicationContext());
+                            db.iniciarBD();
+                            db.abrirBD();
+                            switch (((Habitacion) adapter.getItem(info.position)).getImagenHabitacion()) {
+                                case R.drawable.cama:
+                                    db.guardarContador(0, db.recuperarContador(0) - 1);
+                                    break;
+                                case R.drawable.salon:
+                                    db.guardarContador(1, db.recuperarContador(1) - 1);
+                                    break;
+                                case R.drawable.cocina:
+                                    db.guardarContador(2, db.recuperarContador(2) - 1);
+                                    break;
+                                case R.drawable.wc:
+                                    db.guardarContador(3, db.recuperarContador(3) - 1);
+                                    break;
+                            }
+                            db.eliminarEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString());
                             ArrayList datosServidor = db.recuperarDatosServidor();
-                            Conexion conexion = new Conexion(Home.this, "*E"+String.valueOf(info.position)+input.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                            Conexion conexion = new Conexion(Home.this, "-E" + String.valueOf(info.position), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
                             conexion.execute();
-                        }else{
-                            Toast.makeText(getApplicationContext(),"Ya existe una estancia con ese mismo nombre",Toast.LENGTH_LONG).show();
+                            db.cerrarBD();
+                            adapter.remove(adapter.getItem(info.position));
                         }
-                        db.cerrarBD();
-                    }
-                });
-                dialogChangeName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                dialogChangeName.show();
-                return true;
-            default:
+                    });
+                    builderDelete.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builderDelete.show();
+                    return true;
+                case R.id.changeName:
+                    AlertDialog.Builder dialogChangeName = new AlertDialog.Builder(this);
+                    dialogChangeName.setTitle("Nombre de la estancia");
+                    boolean insercionCorrecta = false;
+                    final EditText input = new EditText(this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    input.setHint("Nombre");
+                    input.setGravity(Gravity.CENTER_HORIZONTAL);
+                    dialogChangeName.setView(input);
+                    dialogChangeName.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            BDSqlite db = new BDSqlite(getApplicationContext());
+                            db.iniciarBD();
+                            db.abrirBD();
+                            if (!db.existeEstaEstancia(input.getText().toString())) {
+                                db.cambiarNombreEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString(), input.getText().toString());
+                                ((Habitacion) adapter.getItem(info.position)).getTv().setText(input.getText().toString());
+                                adapter.notifyDataSetChanged();
+                                ArrayList datosServidor = db.recuperarDatosServidor();
+                                Conexion conexion = new Conexion(Home.this, "*E" + String.valueOf(info.position) + input.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                                conexion.execute();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Ya existe una estancia con ese mismo nombre", Toast.LENGTH_LONG).show();
+                            }
+                            db.cerrarBD();
+                        }
+                    });
+                    dialogChangeName.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    dialogChangeName.show();
+                    return true;
+                default:
                     return super.onContextItemSelected(item);
+            }
+        }else{
+            AlertDialog.Builder dialogServidor = new AlertDialog.Builder(this);
+            Button boton = new Button(Home.this);
+            boton.setText("Ir a la configuración del servidor");
+            boton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent siguiente = new Intent(Home.this,Servidor.class);
+                    startActivity(siguiente);
+                }
+            });
+            dialogServidor.setView(boton);
+            dialogServidor.show();
         }
+        return super.onContextItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -313,9 +344,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.servidor) {
+        if (id == R.id.servidor) {
             Intent siguiente = new Intent(Home.this,Servidor.class);
             startActivity(siguiente);
         } else if (id == R.id.nav_slideshow) {
@@ -324,8 +353,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             db.abrirBD();
             db.borrarBD();
             db.cerrarBD();
-        } else if (id == R.id.nav_manage) {
-
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

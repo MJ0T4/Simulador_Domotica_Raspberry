@@ -91,16 +91,21 @@ public class CustomAdapterLuz extends ArrayAdapter {
                 db.iniciarBD();
                 db.abrirBD();
                 Luz luz = (Luz) getItem(position);
+                ArrayList datosServidor = db.recuperarDatosServidor();
                 if(isChecked){
                     luz.setEstado("Encendida");
                     luz.setImg(R.drawable.luzencendida);
                     luz.setSwitchEstado(true);
                     db.cambiarEstado(luz.getEstancia(), luz.getNombre(),1);
+                    Conexion conexion = new Conexion(context,"#"+"1"+String.valueOf(position)+luz.getEstancia(),datosServidor.get(0).toString(),Integer.valueOf(datosServidor.get(1).toString()));
+                    conexion.execute();
                 }else{
                     luz.setEstado("Apagada");
                     luz.setImg(R.drawable.luzapagada2);
                     luz.setSwitchEstado(false);
                     db.cambiarEstado(luz.getEstancia(), luz.getNombre(),0);
+                    Conexion conexion = new Conexion(context,"#"+"0"+String.valueOf(position)+luz.getEstancia(),datosServidor.get(0).toString(),Integer.valueOf(datosServidor.get(1).toString()));
+                    conexion.execute();
                 }
                 notifyDataSetChanged();
             }
