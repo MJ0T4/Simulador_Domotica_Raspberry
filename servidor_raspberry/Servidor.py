@@ -1,15 +1,17 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
 import socket
 import sys
 import threading
+from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
+
 from Database import Database
 
-HOST = "192.168.0.156"
+HOST = "10.160.34.152"
 PORT = 8888
 
 class Servidor():
+
     def __init__(self):
         self.ventana = Tk()
         self.ventana.title('Servidor')
@@ -27,6 +29,13 @@ class Servidor():
         self.eliminar.pack(fill='x')
         self.notebook = ttk.Notebook(self.ventana)
         self.notebook.pack(fill='both', expand='yes')
+        self.bombillaApagada = PhotoImage(file="imagenes/luzapagada2.png")
+        self.bombillaEncendida = PhotoImage(file="imagenes/luzencendida.png")
+        self.cama = PhotoImage(file="imagenes/cama.png")
+        self.salon = PhotoImage(file="imagenes/salon.png")
+        self.cocina = PhotoImage(file="imagenes/cocina.png")
+        self.wc = PhotoImage(file="imagenes/wc.png")
+        self.imagenesEstancias = {0 : self.cama, 1 : self.salon, 2 : self.cocina, 3 : self.wc}
 
         servidor = threading.Thread(target=self.iniciarServidor)
         servidor.start()
@@ -35,13 +44,17 @@ class Servidor():
         for i in range(db.numeroEstancias()):
             estancia = db.recuperarEstancia(i)
             contenedor = Frame(self.notebook)
-            self.notebook.add(child=contenedor, text=estancia[1])
+            self.notebook.add(child=contenedor, text=estancia[1], image=self.imagenesEstancias[estancia[0]], compound=LEFT)
             self.framesPestannas.append(contenedor)
             self.estancias[estancia[1]] = []
             for j in range(db.numeroElementos(estancia[1])):
                 elemento = db.recuperarElemento(estancia[1],j)
-                label = Label(contenedor, text=elemento[1])
-                label.pack()
+                label = Label(contenedor, text=elemento[1], compound=TOP)
+                if elemento[2] == 0:
+                    label['image'] = self.bombillaApagada
+                else:
+                    label['image'] = self.bombillaEncendida
+                label.grid()
                 self.estancias[estancia[1]].append(label)
         db.cerrarBD()
         self.ventana.mainloop()
@@ -147,15 +160,14 @@ class Servidor():
         if datos[0] == '+':
             if datos[1] == 'E':
                 contenedor = Frame(self.notebook)
-                self.notebook.add(child=contenedor,text=datos[3:])
+                self.notebook.add(child=contenedor,text=datos[3:], compound=LEFT , image=self.imagenesEstancias[int(datos[2:3])], padding = 5)
                 self.framesPestannas.append(contenedor)
                 self.estancias[datos[3:]]=[]
                 db.insertarEstancia(datos[2:3], datos[3:])
             else:
                 lista = self.estancias[self.notebook.tab(int(datos[2:3]),'text')]
-                #imagen = PhotoImage(file="imagenes\luzapagada2.png")
-                label = Label(self.framesPestannas[int(datos[2:3])], text=datos[3:])
-                label.pack()
+                label = Label(self.framesPestannas[int(datos[2:3])], text=datos[3:], compound=TOP, image=self.bombillaApagada)
+                label.grid()
                 lista.append(label)
                 self.estancias[self.notebook.tab(datos[2:3],'text')] = lista
                 db.insertarElemento(self.notebook.tab(int(datos[2:3]),'text'), datos[3:], 0)
@@ -186,7 +198,15 @@ class Servidor():
                         label['text'] = datos[4:]
                 else:
                     if datos[0] == '#':
-                        lista = self.estancias[self.notebook.tab(int(datos[1]), 'text')]
+                        bombilla = db.recuperarElemento(datos[3:],int(datos[2]))
+                        db.actualizarEstado(datos[3:],bombilla[1],int(datos[1]))
+                        label = self.estancias[datos[3:]][int(datos[2])]
+                        if datos[1] == '1':
+                            label['image'] = self.bombillaEncendida
+                        else:
+                            label['image'] = self.bombillaApagada
+                    else:
+                        print('No entra en ninguno')
         db.cerrarBD()
 
 
@@ -225,9 +245,14 @@ class Servidor():
                     else:
                         print('Ya no hay mas datos para leer')
                         break
-            finally:
-                # Cerrando conexion
+
+            except Exception as e:
+                print('Se ha producido un error')
                 connection.close()
+
+            #finally:
+                # Cerrando conexion
+
 
 # Se define la función main() que es en realidad la que indica
 # el comienzo del programa. Dentro de ella se crea el objeto
