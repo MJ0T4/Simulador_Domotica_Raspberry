@@ -7,26 +7,23 @@ from tkinter import ttk
 
 from Database import Database
 
-HOST = "10.160.34.152"
+HOST = socket.gethostname()
 PORT = 8888
 
 class Servidor():
 
     def __init__(self):
+        servidor = threading.Thread(target=self.iniciarServidor)
+        servidor.start()
+        self.framesPestannas = []
+        self.estancias = {}
+        self.iniciarInterfaz()
+
+    def iniciarInterfaz(self):
         self.ventana = Tk()
         self.ventana.title('Servidor')
         self.ventana.configure(bg='black')
-        self.centrarVentana(self.ventana, 600,600)
-        self.bottom = Frame(self.ventana, bd=0, bg='gray')
-        self.bottom.pack(side=RIGHT, fill='y')
-        self.annadir = Button(self.bottom, text='Añadir Estancia', command=self.agregarEstancia, fg='white',bg='black')
-        self.annadir.pack(fill='x')
-        self.cambiarNombre = Button(self.bottom, text='Cambiar nombre', command=self.cambiarNombreEstancia, fg='white',
-                                    bg='black')
-        self.cambiarNombre.pack(fill='x')
-        self.eliminar = Button(self.bottom, text='Eliminar Estancia', command=self.eliminarEstancia, fg='white',
-                                    bg='black')
-        self.eliminar.pack(fill='x')
+        self.centrarVentana(self.ventana, 600, 600)
         self.notebook = ttk.Notebook(self.ventana)
         self.notebook.pack(fill='both', expand='yes')
         self.bombillaApagada = PhotoImage(file="imagenes/luzapagada2.png")
@@ -35,20 +32,18 @@ class Servidor():
         self.salon = PhotoImage(file="imagenes/salon.png")
         self.cocina = PhotoImage(file="imagenes/cocina.png")
         self.wc = PhotoImage(file="imagenes/wc.png")
-        self.imagenesEstancias = {0 : self.cama, 1 : self.salon, 2 : self.cocina, 3 : self.wc}
-
-        servidor = threading.Thread(target=self.iniciarServidor)
-        servidor.start()
+        self.imagenesEstancias = {0: self.cama, 1: self.salon, 2: self.cocina, 3: self.wc}
 
         db = Database()
         for i in range(db.numeroEstancias()):
             estancia = db.recuperarEstancia(i)
             contenedor = Frame(self.notebook)
-            self.notebook.add(child=contenedor, text=estancia[1], image=self.imagenesEstancias[estancia[0]], compound=LEFT)
+            self.notebook.add(child=contenedor, text=estancia[1], image=self.imagenesEstancias[estancia[0]],
+                              compound=LEFT)
             self.framesPestannas.append(contenedor)
             self.estancias[estancia[1]] = []
             for j in range(db.numeroElementos(estancia[1])):
-                elemento = db.recuperarElemento(estancia[1],j)
+                elemento = db.recuperarElemento(estancia[1], j)
                 label = Label(contenedor, text=elemento[1], compound=TOP)
                 if elemento[2] == 0:
                     label['image'] = self.bombillaApagada
@@ -67,93 +62,6 @@ class Servidor():
         x = (screen_width / 2) - (width / 2)
         y = (screen_height / 2) - (height / 2)
         ventana.geometry('%dx%d+%d+%d' % (width, height, x, y))
-
-    def agregarEstancia(self):
-        self.ventanaSecundaria = Toplevel(self.ventana)
-        width = self.ventana.winfo_width() + (self.ventana.winfo_screenwidth() / 2) - (self.ventana.winfo_width() / 2)
-        height = (self.ventana.winfo_screenheight() / 2) - (self.ventana.winfo_height() / 2)
-        self.ventanaSecundaria.geometry('200x250+%d+%d' % (width, height))
-        self.ventanaSecundaria.title('Nueva estancia')
-        nombre = Label(self.ventanaSecundaria, text='Nombre', width=30)
-        nombre.pack()
-        self.recogerNombre = Entry(self.ventanaSecundaria, width=30)
-        self.recogerNombre.pack()
-        Button(self.ventanaSecundaria, text='Agregar estancia', command=self.agregarPestanna).pack()
-        self.ventanaSecundaria.grab_set() # No permite interactuar con otra ventana que no sea ésta
-        self.ventana.wait_window(self.ventanaSecundaria)
-
-    def agregarPestanna(self):
-        nombre = self.recogerNombre.get()
-        estancia = Frame(self.notebook)
-        self.framesPestannas.append(estancia)
-        opciones = Frame(estancia)
-        opciones.pack(side=BOTTOM, fill='x')
-        Button(estancia, text = 'Añadir bombilla', command = self.agregarIluminacion, fg = 'white', bg = 'black').pack(side=BOTTOM)
-        if (nombre == ''):
-            self.notebook.add(estancia, text="Estancia")
-        else:
-            self.notebook.add(estancia, text=nombre)
-        self.recogerNombre.delete(0,'end') # Limpia el cajón
-        self.ventanaSecundaria.destroy()
-
-    def cambiarNombreEstancia(self):
-        if(len(self.notebook.tabs())>0):
-            self.ventanaSecundaria = Toplevel(self.ventana)
-            width = self.ventana.winfo_width() + (self.ventana.winfo_screenwidth() / 2) - (self.ventana.winfo_width() / 2)
-            height = (self.ventana.winfo_screenheight() / 2) - (self.ventana.winfo_height() / 2)
-            self.ventanaSecundaria.geometry('200x250+%d+%d' % (width, height))
-            self.ventanaSecundaria.title('Cambiar nombre estancia')
-            nombre = Label(self.ventanaSecundaria, text='Nuevo nombre', width=30)
-            nombre.pack()
-            self.recogerNombre = Entry(self.ventanaSecundaria, width=30)
-            self.recogerNombre.pack()
-            Button(self.ventanaSecundaria, text='Cambiar nombre', command=self.cambiarNombrePestanna).pack()
-            self.ventana.wait_window(self.ventanaSecundaria)
-        else:
-            messagebox.showerror('Error','No existe ninguna estancia para modificar su nombre')
-
-    def cambiarNombrePestanna(self):
-        nombre = self.recogerNombre.get()
-        if (nombre != ''):
-            self.notebook.tab('current', text=nombre)
-        self.recogerNombre.delete(0,'end') # Limpia el cajón
-
-    def eliminarEstancia(self):
-        if(len(self.notebook.tabs())>0):
-            nombre = self.notebook.tab('current','text')
-            if messagebox.askokcancel(title='Comprobación',message='¿Estás seguro de que deseas eliminar la estancia %s?' % (nombre)):
-                print(self.framesPestannas[self.notebook.index('current')])
-                self.framesPestannas.remove(self.framesPestannas[(self.notebook.index('current'))])
-                self.notebook.forget('current')
-        else:
-            messagebox.showerror('Error','No existe ninguna estancia para eliminar')
-
-    def agregarIluminacion(self):
-        self.ventanaSecundaria = Toplevel(self.ventana)
-        width = self.ventana.winfo_width() + (self.ventana.winfo_screenwidth() / 2) - (
-        self.ventana.winfo_width() / 2)
-        height = (self.ventana.winfo_screenheight() / 2) - (self.ventana.winfo_height() / 2)
-        self.ventanaSecundaria.geometry('200x250+%d+%d' % (width, height))
-        self.ventanaSecundaria.title('Nueva bombilla')
-        nombre = Label(self.ventanaSecundaria, text='Nombre', width=30)
-        nombre.pack()
-        self.recogerNombre = Entry(self.ventanaSecundaria, width=30)
-        self.recogerNombre.pack()
-        Button(self.ventanaSecundaria, text='Agregar bombilla', command=lambda: self.agregarBombilla(self.framesPestannas[self.notebook.index('current')])).pack()
-        self.ventanaSecundaria.grab_set()  # No permite interactuar con otra ventana que no sea ésta
-        self.ventana.wait_window(self.ventanaSecundaria)
-        
-    def agregarBombilla(self, ventana):
-        nombre = self.recogerNombre.get()
-        if (nombre == ''):
-            nombre = 'Bombilla'
-        self.label = Label(ventana, text='BOMBILLA')
-        self.label.pack()
-        #Label(ventana, text="Bombilla 1").place(x=40, y=5)
-        #self.estado1 = Label(ventana, text="Apagada")
-        #self.estado1.place(x=45, y=140)
-        self.recogerNombre.delete(0,'end') # Limpia el cajón
-        self.ventanaSecundaria.destroy()
 
     def leerDatos(self, datos):
         db = Database()
@@ -209,10 +117,7 @@ class Servidor():
                         print('No entra en ninguno')
         db.cerrarBD()
 
-
     def iniciarServidor(self):
-        self.framesPestannas = []
-        self.estancias = {}
         # Servidor socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Socket creado correctamente")
@@ -247,9 +152,10 @@ class Servidor():
                         break
 
             except Exception as e:
-                print('Se ha producido un error')
+                print(e)
                 connection.close()
 
+        print('Sale del todo')
             #finally:
                 # Cerrando conexion
 
