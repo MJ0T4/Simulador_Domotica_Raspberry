@@ -78,6 +78,11 @@ public class RecepcionSocket implements Runnable {
             Log.d("Probando","Falla en UnknowHostException");
         } catch (IOException e) {
             e.printStackTrace();
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             Log.d("Probando","Falla en IOException");
         }
     }

@@ -79,12 +79,13 @@ public class Servidor extends AppCompatActivity {
                 recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(),handler);
                 Thread hilo = new Thread(recepcionSocket);
                 hilo.start();
-                if(recepcionSocket.getSocket().isConnected()) {
-                    Toast.makeText(getApplicationContext(), "esta conectado", Toast.LENGTH_LONG).show();
-                    tvEstado.setText("Conectado");
-                    tvEstado.setTextColor(getResources().getColor(R.color.colorGreen));
-                    btConectar.setVisibility(View.INVISIBLE);
-                    btDesconectar.setVisibility(View.VISIBLE);
+                if(!(recepcionSocket.getSocket()==null)){
+                    if(recepcionSocket.getSocket().isConnected()) {
+                        tvEstado.setText("Conectado");
+                        tvEstado.setTextColor(getResources().getColor(R.color.colorGreen));
+                        btConectar.setVisibility(View.INVISIBLE);
+                        btDesconectar.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });

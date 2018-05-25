@@ -59,6 +59,12 @@ public class CustomAdapterEstancia extends ArrayAdapter {
         notifyDataSetChanged();
     }
 
+    @Override
+    public void clear() {
+        lista.clear();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {

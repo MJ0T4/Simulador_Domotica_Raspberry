@@ -114,7 +114,13 @@ class Servidor():
                         else:
                             label['image'] = self.bombillaApagada
                     else:
-                        print('No entra en ninguno')
+                        if datos[0] == '/':
+                            self.notebook.destroy()
+                            self.notebook = ttk.Notebook(self.ventana)
+                            self.notebook.pack(fill='both', expand='yes')
+                            self.framesPestannas = []
+                            self.estancias = {}
+                            db.borrarBD()
         db.cerrarBD()
 
     def iniciarServidor(self):

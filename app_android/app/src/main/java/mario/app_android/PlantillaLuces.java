@@ -52,7 +52,6 @@ public class PlantillaLuces extends AppCompatActivity {
         BDSqlite db = new BDSqlite(getApplicationContext());
         db.iniciarBD();
         db.abrirBD();
-        Toast.makeText(getApplicationContext(),String.valueOf(db.numeroElementos(nombreEstancia)),Toast.LENGTH_LONG).show();
         for(int i=0;i<db.numeroElementos(nombreEstancia);i++){
             contador++;
             ArrayList fila = db.recuperarElemento(i,nombreEstancia);

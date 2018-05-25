@@ -220,19 +220,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 return true;
             }
         }else{
-            AlertDialog.Builder dialogServidor = new AlertDialog.Builder(this);
-            Button boton = new Button(Home.this);
-            boton.setText("Ir a la configuración del servidor");
-            boton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent siguiente = new Intent(Home.this,Servidor.class);
-                    startActivity(siguiente);
-                }
-            });
-            dialogServidor.setView(boton);
-            dialogServidor.show();
-        }
+        AlertDialog.Builder dialogServidor = new AlertDialog.Builder(this);
+        Button boton = new Button(Home.this);
+        boton.setText("Ir a la configuración del servidor");
+        boton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent siguiente = new Intent(Home.this,Servidor.class);
+                startActivity(siguiente);
+            }
+        });
+        dialogServidor.setView(boton);
+        dialogServidor.show();
+    }
         return super.onContextItemSelected(item);
     }
 
@@ -347,16 +347,47 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if (id == R.id.servidor) {
             Intent siguiente = new Intent(Home.this,Servidor.class);
             startActivity(siguiente);
-        } else if (id == R.id.nav_slideshow) {
-            BDSqlite db = new BDSqlite(getApplicationContext());
-            db.iniciarBD();
-            db.abrirBD();
-            db.borrarBD();
-            db.cerrarBD();
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.basededatos) {
+            if(recepcionSocket.getSocket()!= null && !recepcionSocket.getSocket().isClosed() && recepcionSocket.getSocket().isConnected()){
+                AlertDialog.Builder builderDelete = new AlertDialog.Builder(Home.this);
+                builderDelete.setTitle("¿Está seguro de que desea eliminar la base de datos?");
+                builderDelete.setIcon(R.drawable.ic_delete);
+                builderDelete.setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        BDSqlite db = new BDSqlite(getApplicationContext());
+                        db.iniciarBD();
+                        db.abrirBD();
+                        ArrayList datosServidor = db.recuperarDatosServidor();
+                        Conexion conexion = new Conexion(Home.this, "/", datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                        conexion.execute();
+                        adapter.clear();
+                        db.borrarBD();
+                        db.cerrarBD();
+                    }
+                });
+                builderDelete.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                builderDelete.show();
 
-        } else if (id == R.id.nav_send) {
-
+            }else{
+                AlertDialog.Builder dialogServidor = new AlertDialog.Builder(this);
+                Button boton = new Button(Home.this);
+                boton.setText("Ir a la configuración del servidor");
+                boton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent siguiente = new Intent(Home.this,Servidor.class);
+                        startActivity(siguiente);
+                    }
+                });
+                dialogServidor.setView(boton);
+                dialogServidor.show();
+            }
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

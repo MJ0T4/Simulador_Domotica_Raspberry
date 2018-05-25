@@ -24,7 +24,7 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE estancias(id INTEGER, nombre TEXT PRIMARY KEY)");
-        db.execSQL("CREATE TABLE datosServidor(id INTEGER, ip TEXT, puerto INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS datosServidor(id INTEGER, ip TEXT, puerto INTEGER)");
         db.execSQL("CREATE TABLE elementos(estancia TEXT, nombre TEXT, estado INTEGER)");
         db.execSQL("CREATE TABLE contadores(id INTEGER, valor INTEGER)");
         ContentValues valores = new ContentValues();
@@ -99,7 +99,6 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
     @Override
     public void borrarBD() {
         db.execSQL("DROP TABLE IF EXISTS estancias");
-        db.execSQL("DROP TABLE IF EXISTS datosServidor");
         db.execSQL("DROP TABLE IF EXISTS elementos");
         db.execSQL("DROP TABLE IF EXISTS contadores");
         onCreate(db);
