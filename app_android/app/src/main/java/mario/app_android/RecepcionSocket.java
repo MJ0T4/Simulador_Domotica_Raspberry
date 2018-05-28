@@ -24,22 +24,23 @@ public class RecepcionSocket implements Runnable {
     private Socket socket = null;
     private Context context;
     private String received;
-    private Handler handler;
+    private static Handler handler;
     private boolean threadSave;
     private static RecepcionSocket instance;
 
-    private RecepcionSocket(Context context, Handler handler) {
+    private RecepcionSocket(Context context) {
         this.context = context;
-        this.handler = handler;
     }
 
-    public static RecepcionSocket getInstance(Context context, Handler handler){
-        if(instance == null)
-            instance = new RecepcionSocket(context, handler);
+    public static RecepcionSocket getInstance(Context context, Handler handler2) {
+        if (instance == null)
+            instance = new RecepcionSocket(context);
+        if(handler2 != null)
+            handler = handler2;
         return instance;
     }
 
-    public static boolean instanceIsNull(){
+    public static boolean instanceIsNull() {
         return instance == null;
     }
 
@@ -53,16 +54,20 @@ public class RecepcionSocket implements Runnable {
             threadSave = false;
             socket = new Socket();
             socket.connect(new InetSocketAddress(datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString())));
+            db.borrarBD();
             db.cerrarBD();
+            Conexion conexion = new Conexion(context, "<", datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+            conexion.execute();
             while (!socket.isClosed()) {
                 if (threadSave) {
                     socket.close();
-                }else{
+                } else {
                     if (socket.getInputStream().available() > 0) {
                         InputStream stream = socket.getInputStream();
                         byte[] lenBytes = new byte[256];
                         stream.read(lenBytes, 0, 256);
                         received = new String(lenBytes, "UTF-8").trim();
+                        actualizar(received);
                         Message message = Message.obtain();
                         Bundle bundle = new Bundle();
                         bundle.putString("Mensaje", received);
@@ -75,7 +80,7 @@ public class RecepcionSocket implements Runnable {
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
-            Log.d("Probando","Falla en UnknowHostException");
+            Log.d("Probando", "Falla en UnknowHostException");
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -83,15 +88,61 @@ public class RecepcionSocket implements Runnable {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-            Log.d("Probando","Falla en IOException");
+            Log.d("Probando", "Falla en IOException");
         }
     }
 
-    public void cerrarSocket(){
-            threadSave = true;
+    public void cerrarSocket() {
+        threadSave = true;
     }
 
-    public Socket getSocket(){
+    public Socket getSocket() {
         return this.socket;
+    }
+
+    public void actualizar(String mensaje) {
+        BDSqlite db = new BDSqlite(context);
+        db.iniciarBD();
+        db.abrirBD();
+        if (mensaje.charAt(0) == '+') {
+            if (mensaje.charAt(1) == 'E') {
+                db.guardarEstancia(Integer.valueOf(String.valueOf(mensaje.charAt(2))), mensaje.substring(3, mensaje.length()));
+            } else {
+                String estancia = db.recuperarEstancia(Integer.valueOf(String.valueOf(mensaje.charAt(2)))).get(1).toString();
+                db.guardarElemento(estancia, mensaje.substring(4, mensaje.length()), Integer.valueOf(String.valueOf(mensaje.charAt(3))));
+            }
+        } else {
+            if (mensaje.charAt(0) == '-') {
+                if (mensaje.charAt(1) == 'E') {
+                    String estancia = db.recuperarEstancia(Integer.valueOf(String.valueOf(mensaje.charAt(2)))).get(1).toString();
+                    db.eliminarEstancia(estancia);
+                } else {
+                    String estancia = db.recuperarEstancia(Integer.valueOf(String.valueOf(mensaje.charAt(2)))).get(1).toString();
+                    String elemento = db.recuperarElemento(Integer.valueOf(String.valueOf(mensaje.charAt(3))), estancia).get(0).toString();
+                    db.eliminarElemento(estancia, elemento);
+                }
+            } else {
+                if (mensaje.charAt(0) == '*') {
+                    if (mensaje.charAt(1) == 'E') {
+                        String nombreAntiguo = db.recuperarEstancia(Integer.valueOf(String.valueOf(mensaje.charAt(2)))).get(1).toString();
+                        db.cambiarNombreEstancia(nombreAntiguo, mensaje.substring(3, mensaje.length()));
+                    } else {
+                        String estancia = db.recuperarEstancia(Integer.valueOf(String.valueOf(mensaje.charAt(2)))).get(1).toString();
+                        String nombreAntiguo = db.recuperarElemento(Integer.valueOf(String.valueOf(mensaje.charAt(3))), estancia).get(0).toString();
+                        db.cambiarNombreElemento(estancia, nombreAntiguo, mensaje.substring(4, mensaje.length()));
+                    }
+                } else {
+                    if (mensaje.charAt(0) == '#') {
+                        String elemento = db.recuperarElemento(Integer.valueOf(String.valueOf(mensaje.charAt(2))), mensaje.substring(3, mensaje.length())).get(0).toString();
+                        db.cambiarEstado(mensaje.substring(3, mensaje.length()),elemento, Integer.valueOf(String.valueOf(mensaje.charAt(1))));
+                    } else {
+                        if (mensaje.charAt(0) == '/') {
+                            db.borrarBD();
+                        }
+                    }
+                }
+                db.cerrarBD();
+            }
+        }
     }
 }

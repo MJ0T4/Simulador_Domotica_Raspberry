@@ -68,7 +68,7 @@ class Servidor():
         width = self.ventana.winfo_width() + (self.ventana.winfo_screenwidth() / 2) - (
         self.ventana.winfo_width() / 2)
         height = (self.ventana.winfo_screenheight() / 2) - (self.ventana.winfo_height() / 2)
-        self.ventanaSecundaria.geometry('200x250+%d+%d' % (width, height))
+        self.ventanaSecundaria.geometry('200x100+%d+%d' % (width, height))
         self.ventanaSecundaria.title('Introducir IP')
         nombre = Label(self.ventanaSecundaria, text='IP del servidor', width=30)
         nombre.pack()
@@ -169,6 +169,9 @@ class Servidor():
                     except Exception as e:
                         print(e)
                         conexionesCerradas.append(self.conexionClientes[i])
+        else:
+            mensaje = "Connected"
+            conn.sendall(mensaje.encode())
         for j in range(len(conexionesCerradas)):
             self.conexionClientes.remove(conexionesCerradas[j])
         db.cerrarBD()

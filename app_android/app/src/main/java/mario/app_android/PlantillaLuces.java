@@ -3,6 +3,8 @@ package mario.app_android;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +32,7 @@ public class PlantillaLuces extends AppCompatActivity {
     private int contador = 0;
     private int posicion;
     private RecepcionSocket recepcionSocket;
+    public Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,26 +50,19 @@ public class PlantillaLuces extends AppCompatActivity {
         // Para próximos avances si tratamos de distinguir de donde vino
         nombreEstancia = (String) getIntent().getExtras().get("nombreEstancia");
         posicion = (Integer) getIntent().getExtras().get("posicion");
-        recepcionSocket = RecepcionSocket.getInstance(this,null);
 
-        BDSqlite db = new BDSqlite(getApplicationContext());
-        db.iniciarBD();
-        db.abrirBD();
-        for(int i=0;i<db.numeroElementos(nombreEstancia);i++){
-            contador++;
-            ArrayList fila = db.recuperarElemento(i,nombreEstancia);
-            String texto = "Apagada";
-            Boolean estado = false;
-            int imagen = R.drawable.luzapagada2;
-            if(((Integer) fila.get(1))==1){
-                texto = "Encendida";
-                estado = true;
-                imagen = R.drawable.luzencendida;
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
+                adapterLuz.clear();
+                actualizarVista(true);
             }
-            adapterLuz.add(new Luz(imagen,fila.get(0).toString(),texto,estado,nombreEstancia));
-            adapterLuz.notifyDataSetChanged();
-        }
-        db.cerrarBD();
+        };
+
+        recepcionSocket = RecepcionSocket.getInstance(this, handler);
+
+        actualizarVista(false);
     }
 
     @Override
@@ -248,5 +244,27 @@ public class PlantillaLuces extends AppCompatActivity {
             dialogServidor.show();
         }
         return super.onContextItemSelected(item);
+    }
+
+    public void actualizarVista(boolean contadores){
+        BDSqlite db = new BDSqlite(getApplicationContext());
+        db.iniciarBD();
+        db.abrirBD();
+        for(int i=0;i<db.numeroElementos(nombreEstancia);i++){
+            if(contadores)
+                contador++;
+            ArrayList fila = db.recuperarElemento(i,nombreEstancia);
+            String texto = "Apagada";
+            Boolean estado = false;
+            int imagen = R.drawable.luzapagada2;
+            if(((Integer) fila.get(1))==1){
+                texto = "Encendida";
+                estado = true;
+                imagen = R.drawable.luzencendida;
+            }
+            adapterLuz.add(new Luz(imagen,fila.get(0).toString(),texto,estado,nombreEstancia));
+            adapterLuz.notifyDataSetChanged();
+        }
+        db.cerrarBD();
     }
 }

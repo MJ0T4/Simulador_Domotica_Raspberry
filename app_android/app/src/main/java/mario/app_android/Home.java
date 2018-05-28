@@ -54,7 +54,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         handler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje").toString(),Toast.LENGTH_SHORT).show();
+                BDSqlite db = new BDSqlite(getApplicationContext());
+                db.iniciarBD();
+                db.abrirBD();
+                Toast.makeText(getApplicationContext(),String.valueOf(db.numeroEstancias()),Toast.LENGTH_SHORT).show();
+                adapter.clear();
+                actualizarVista(true);
+                db.cerrarBD();
             }
         };
 
@@ -62,7 +69,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         db.iniciarBD();
         db.abrirBD();
         ArrayList datosServidor = db.recuperarDatosServidor();
-        recepcionSocket = RecepcionSocket.getInstance(this,handler);
+        recepcionSocket = RecepcionSocket.getInstance(this, handler);
         if(recepcionSocket.getSocket()==null || recepcionSocket.getSocket().isClosed()) {
             if (!datosServidor.get(0).toString().equals("IP")) {
                 Toast.makeText(getApplicationContext(),datosServidor.get(0).toString(),Toast.LENGTH_LONG).show();
@@ -72,30 +79,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 Toast.makeText(getApplicationContext(), "No se ha conectar al servidor, compruebe los datos introducidos", Toast.LENGTH_LONG).show();
             }
         }
-        if(db.numeroEstancias()!=0)
-            for(int i = 0; i < db.numeroEstancias();i++){
-                ArrayList fila = db.recuperarEstancia(i);
-                TextView tv = new TextView(getApplicationContext());
-                switch(Integer.valueOf(fila.get(0).toString())){
-                    case 0:
-                        tv.setText(fila.get(1).toString());
-                        adapter.add(new Habitacion(R.drawable.cama, tv));
-                        break;
-                    case 1:
-                        tv.setText(fila.get(1).toString());
-                        adapter.add(new Habitacion(R.drawable.salon, tv));
-                        break;
-                    case 2:
-                        tv.setText(fila.get(1).toString());
-                        adapter.add(new Habitacion(R.drawable.cocina, tv));
-                        break;
-                    case 3:
-                        tv.setText(fila.get(1).toString());
-                        adapter.add(new Habitacion(R.drawable.wc, tv));
-                        break;
-                }
-            }
-        db.cerrarBD();
+
+        actualizarVista(false);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -392,5 +377,39 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void actualizarVista(boolean contadores){
+        BDSqlite db = new BDSqlite(getApplicationContext());
+        db.iniciarBD();
+        db.abrirBD();
+        //Toast.makeText(getApplicationContext(),"ENTRA ANTES",Toast.LENGTH_SHORT).show();
+        if(db.numeroEstancias()!=0)
+            //Toast.makeText(getApplicationContext(),"ENTRA DESPUES",Toast.LENGTH_SHORT).show();
+            for(int i = 0; i < db.numeroEstancias();i++){
+                ArrayList fila = db.recuperarEstancia(i);
+                TextView tv = new TextView(getApplicationContext());
+                if(contadores)
+                    db.guardarContador(Integer.valueOf(fila.get(0).toString()), db.recuperarContador(Integer.valueOf(fila.get(0).toString())) + 1);
+                switch(Integer.valueOf(fila.get(0).toString())){
+                    case 0:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.cama, tv));
+                        break;
+                    case 1:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.salon, tv));
+                        break;
+                    case 2:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.cocina, tv));
+                        break;
+                    case 3:
+                        tv.setText(fila.get(1).toString());
+                        adapter.add(new Habitacion(R.drawable.wc, tv));
+                        break;
+                }
+            }
+        db.cerrarBD();
     }
 }

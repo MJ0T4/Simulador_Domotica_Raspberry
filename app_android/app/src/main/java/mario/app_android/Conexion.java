@@ -2,6 +2,7 @@ package mario.app_android;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -31,11 +32,12 @@ public class Conexion extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new AlertDialog.Builder(context).create();
-            progressDialog.setTitle("Conectando al servidor");
-            progressDialog.setMessage("Por favor espere...");
-            progressDialog.setView(new ProgressBar(context));
-            progressDialog.show();
+            /*
+                progressDialog = new AlertDialog.Builder(context).create();
+                progressDialog.setTitle("Conectando al servidor");
+                progressDialog.setMessage("Por favor espere...");
+                progressDialog.setView(new ProgressBar(context));
+                progressDialog.show();*/
         }
 
         @Override
@@ -74,7 +76,7 @@ public class Conexion extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            progressDialog.dismiss();
+            //progressDialog.dismiss();
         }
 
 

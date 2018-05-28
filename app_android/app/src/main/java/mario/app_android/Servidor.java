@@ -44,7 +44,7 @@ public class Servidor extends AppCompatActivity {
         btConectar = findViewById(R.id.btConectar);
         btDesconectar = findViewById(R.id.btDesconectar);
         tvEstado = findViewById(R.id.tvEstado);
-        recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(),handler);
+        recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(), handler);
         if(!(recepcionSocket.getSocket()==null)){
             if(recepcionSocket.getSocket().isConnected()) {
                 tvEstado.setText("Conectado");
@@ -58,7 +58,15 @@ public class Servidor extends AppCompatActivity {
         handler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
+                if(msg.getData().getString("Mensaje").equals("Connected")){
+                    tvEstado.setText("Conectado");
+                    tvEstado.setTextColor(getResources().getColor(R.color.colorGreen));
+                    btConectar.setVisibility(View.INVISIBLE);
+                    btDesconectar.setVisibility(View.VISIBLE);
+                }else{
+                    Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
+                }
+
             }
         };
 
@@ -79,14 +87,6 @@ public class Servidor extends AppCompatActivity {
                 recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(),handler);
                 Thread hilo = new Thread(recepcionSocket);
                 hilo.start();
-                if(!(recepcionSocket.getSocket()==null)){
-                    if(recepcionSocket.getSocket().isConnected()) {
-                        tvEstado.setText("Conectado");
-                        tvEstado.setTextColor(getResources().getColor(R.color.colorGreen));
-                        btConectar.setVisibility(View.INVISIBLE);
-                        btDesconectar.setVisibility(View.VISIBLE);
-                    }
-                }
             }
         });
 
@@ -95,7 +95,7 @@ public class Servidor extends AppCompatActivity {
             public void onClick(View v) {
                 btConectar.setVisibility(View.VISIBLE);
                 if(!(RecepcionSocket.instanceIsNull())) {
-                    recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(),handler);
+                    recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(), handler);
                     recepcionSocket.cerrarSocket();
                     Toast.makeText(getApplicationContext(), "Cierra el socket", Toast.LENGTH_LONG).show();
                     tvEstado.setText("No conectado");
