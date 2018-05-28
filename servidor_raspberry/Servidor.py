@@ -1,23 +1,28 @@
 import socket
-import sys
-import threading
+import _thread
 from tkinter import *
-from tkinter import messagebox
 from tkinter import ttk
+from tkinter import messagebox
+import time
 
 from Database import Database
-
-HOST = socket.gethostname()
-PORT = 8888
 
 class Servidor():
 
     def __init__(self):
-        servidor = threading.Thread(target=self.iniciarServidor)
-        servidor.start()
+        db = Database()
+        self.host = db.recuperarIp()[0][1]
+        db.cerrarBD()
+        self.port = 8888
+        _thread.start_new_thread(self.iniciarServidor, ())
         self.framesPestannas = []
         self.estancias = {}
         self.iniciarInterfaz()
+        self.ventanaIp = Toplevel(self.ventana)
+        self.centrarVentana(self.ventanaIp, 200, 200)
+        self.valorIp = Entry(self.ventanaIp)
+        self.valorIp.pack()
+        self.ventana.wait_window(self.ventanaIp)
 
     def iniciarInterfaz(self):
         self.ventana = Tk()
@@ -49,7 +54,7 @@ class Servidor():
                     label['image'] = self.bombillaApagada
                 else:
                     label['image'] = self.bombillaEncendida
-                label.grid()
+                label.pack(anchor=NW, side=LEFT)
                 self.estancias[estancia[1]].append(label)
         db.cerrarBD()
         self.ventana.mainloop()
@@ -63,8 +68,34 @@ class Servidor():
         y = (screen_height / 2) - (height / 2)
         ventana.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-    def leerDatos(self, datos):
+    def agregarIp(self):
+        self.ventanaSecundaria = Toplevel(self.ventana)
+        width = self.ventana.winfo_width() + (self.ventana.winfo_screenwidth() / 2) - (
+        self.ventana.winfo_width() / 2)
+        height = (self.ventana.winfo_screenheight() / 2) - (self.ventana.winfo_height() / 2)
+        self.ventanaSecundaria.geometry('200x250+%d+%d' % (width, height))
+        self.ventanaSecundaria.title('Introducir IP')
+        nombre = Label(self.ventanaSecundaria, text='IP del servidor', width=30)
+        nombre.pack()
+        self.recogerNombre = Entry(self.ventanaSecundaria, width=30)
+        self.recogerNombre.pack()
+        Button(self.ventanaSecundaria, text='Actualizar IP', command=self.actualizarIp).pack()
+        self.ventanaSecundaria.grab_set()  # No permite interactuar con otra ventana que no sea ésta
+        self.ventana.wait_window(self.ventanaSecundaria)
+
+    def actualizarIp(self):
+        ip = self.recogerNombre.get()
         db = Database()
+        db.actualizarIP(ip)
+        self.host = db.recuperarIp()[0][1]
+        _thread.start_new_thread(self.iniciarServidor, ())
+        self.ventanaSecundaria.destroy()
+        db.cerrarBD()
+
+    def leerDatos(self, datos, conn):
+        db = Database()
+        mensaje = datos
+        conexionesCerradas = []
         if datos[0] == '+':
             if datos[1] == 'E':
                 contenedor = Frame(self.notebook)
@@ -75,10 +106,11 @@ class Servidor():
             else:
                 lista = self.estancias[self.notebook.tab(int(datos[2:3]),'text')]
                 label = Label(self.framesPestannas[int(datos[2:3])], text=datos[3:], compound=TOP, image=self.bombillaApagada)
-                label.grid()
+                label.pack(anchor=NW, side=LEFT)
                 lista.append(label)
                 self.estancias[self.notebook.tab(datos[2:3],'text')] = lista
                 db.insertarElemento(self.notebook.tab(int(datos[2:3]),'text'), datos[3:], 0)
+                mensaje = datos[0:3]+"0"+datos[3:]
         else:
             if datos[0] == '-':
                 if datos[1] == 'E':
@@ -121,29 +153,69 @@ class Servidor():
                             self.framesPestannas = []
                             self.estancias = {}
                             db.borrarBD()
+                        else:
+                            if datos[0] == '<':
+                                for i in range(db.numeroEstancias()):
+                                    estancia = db.recuperarEstancia(i)
+                                    mensajeEstancia = "+E"+str(estancia[0])+str(estancia[1])
+                                    conn.sendall(mensajeEstancia.encode())
+                                    time.sleep(0.1)
+                                    for j in range(db.numeroElementos(estancia[1])):
+                                        elemento = db.recuperarElemento(estancia[1], j)
+                                        mensajeElemento = "+B"+str(i)+str(elemento[2])+str(elemento[1])
+                                        conn.sendall(mensajeElemento.encode())
+                                        time.sleep(0.1)
+        if datos[0] != '<':
+            print(len(self.conexionClientes))
+            for i in range(len(self.conexionClientes)):
+                if self.conexionClientes[i] != conn:
+                    try:
+                        self.conexionClientes[i].sendall(mensaje.encode())
+                    except Exception as e:
+                        print(e)
+                        conexionesCerradas.append(self.conexionClientes[i])
+        for j in range(len(conexionesCerradas)):
+            self.conexionClientes.remove(conexionesCerradas[j])
         db.cerrarBD()
+
+    def clienteThread(self, conn):
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
+            self.leerDatos(data.decode(), conn)
+            print('Recibido el mensaje ' + "'" + data.decode() + "'")
+        conn.close()
+        self.conexionClientes.remove(conn)
+        print(self.conexionClientes)
 
     def iniciarServidor(self):
         # Servidor socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Socket creado correctamente")
 
+        self.conexionClientes = []
+
         try:
-            s.bind((HOST, PORT))
+            s.bind((self.host, self.port))
         except socket.error as err:
-            print("Bind Failed, Error Code: " + str(err[0]) + ", Message: " + err[1])
+            messagebox.showerror("Error","Se ha producido un error en la creación del Servidor. Compruebe de nuevo la IP introducida")
+            self.agregarIp()
             sys.exit()
 
-        s.listen(10)
         print("Socket está ahora escuchando")
+
+        s.listen(10)
 
         while True:
             # Esperando conexion
             print('Esperando para conectarse')
             connection, client_address = s.accept()
-
+            print('Conexión desde' + str(client_address))
+            self.conexionClientes.append(connection)
+            _thread.start_new_thread(self.clienteThread, (connection,))
+            """
             try:
-                print('Conexión desde' + str(client_address))
 
                 # Recibe los datos en trozos y reetransmite
                 while True:
@@ -163,7 +235,7 @@ class Servidor():
 
         print('Sale del todo')
             #finally:
-                # Cerrando conexion
+                # Cerrando conexion"""
 
 
 # Se define la función main() que es en realidad la que indica

@@ -6,6 +6,8 @@ class Database():
         self.cursor = self.conn.cursor()
         self.cursor.execute("CREATE TABLE IF NOT EXISTS estancias(id INTEGER, nombre TEXT PRIMARY KEY)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS elementos(estancia TEXT, nombre TEXT, estado INTEGER)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS tableIp(id INTEGER, ip TEXT)")
+        self.cursor.execute("INSERT INTO tableIp VALUES (?,?)", (0,"prueba"))
 
     def insertarEstancia(self, id, nombre):
         self.cursor.execute("INSERT INTO estancias VALUES (?,?)",(id, nombre))
@@ -28,6 +30,11 @@ class Database():
         self.cursor.execute("UPDATE elementos SET estado = ? WHERE estancia = ? AND nombre = ?",(estado, estancia, nombre))
         self.conn.commit()
 
+    def actualizarIP(self, ip):
+        self.cursor.execute("UPDATE tableIp SET ip = ? WHERE id = 0",
+                            (ip,))
+        self.conn.commit()
+
     def eliminarEstancia(self, estancia):
         self.cursor.execute("DELETE FROM estancias WHERE nombre = ?", (estancia,))
         self.cursor.execute("DELETE FROM elementos WHERE estancia = ?", (estancia,))
@@ -48,6 +55,11 @@ class Database():
         lista = self.cursor.fetchall()
         return lista[index]
 
+    def recuperarIp(self):
+        self.cursor.execute("SELECT * FROM tableIp WHERE id=?", (0,))
+        lista = self.cursor.fetchall()
+        return lista
+
     def numeroEstancias(self):
         self.cursor.execute("SELECT * FROM estancias")
         lista = self.cursor.fetchall()
@@ -65,4 +77,5 @@ class Database():
     def borrarBD(self):
         self.cursor.execute("DROP TABLE IF EXISTS estancias")
         self.cursor.execute("DROP TABLE IF EXISTS elementos")
+        self.cursor.execute("DROP TABLE IF EXISTS tableIp")
         self.conn.commit()
