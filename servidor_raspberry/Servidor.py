@@ -18,11 +18,6 @@ class Servidor():
         self.framesPestannas = []
         self.estancias = {}
         self.iniciarInterfaz()
-        self.ventanaIp = Toplevel(self.ventana)
-        self.centrarVentana(self.ventanaIp, 200, 200)
-        self.valorIp = Entry(self.ventanaIp)
-        self.valorIp.pack()
-        self.ventana.wait_window(self.ventanaIp)
 
     def iniciarInterfaz(self):
         self.ventana = Tk()
