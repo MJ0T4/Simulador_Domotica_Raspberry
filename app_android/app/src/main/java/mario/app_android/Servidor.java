@@ -66,7 +66,6 @@ public class Servidor extends AppCompatActivity {
                 }else{
                     Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
                 }
-
             }
         };
 
@@ -97,7 +96,6 @@ public class Servidor extends AppCompatActivity {
                 if(!(RecepcionSocket.instanceIsNull())) {
                     recepcionSocket = RecepcionSocket.getInstance(getApplicationContext(), handler);
                     recepcionSocket.cerrarSocket();
-                    Toast.makeText(getApplicationContext(), "Cierra el socket", Toast.LENGTH_LONG).show();
                     tvEstado.setText("No conectado");
                     tvEstado.setTextColor(getResources().getColor(R.color.colorRed));
                     btConectar.setVisibility(View.VISIBLE);

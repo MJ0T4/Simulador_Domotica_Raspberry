@@ -29,7 +29,6 @@ public class PlantillaLuces extends AppCompatActivity {
     private CustomAdapterLuz adapterLuz;
     private ListView lvLuz;
     private String nombreEstancia;
-    private int contador = 0;
     private int posicion;
     private RecepcionSocket recepcionSocket;
     public Handler handler;
@@ -56,13 +55,13 @@ public class PlantillaLuces extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
                 adapterLuz.clear();
-                actualizarVista(true);
+                actualizarVista();
             }
         };
 
         recepcionSocket = RecepcionSocket.getInstance(this, handler);
 
-        actualizarVista(false);
+        actualizarVista();
     }
 
     @Override
@@ -94,28 +93,28 @@ public class PlantillaLuces extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if(imagen[0]!=0){
-                                contador++;
                                 TextView tv = new TextView(getApplicationContext());
-                                if(input.getText().length()>0)
+                                if(input.getText().length()>0) {
                                     tv.setText(input.getText().toString());
-                                else
-                                    tv.setText("Bombilla "+String.valueOf(contador));
-                                BDSqlite db = new BDSqlite(getApplicationContext());
-                                db.iniciarBD();
-                                db.abrirBD();
-                                if(!db.existeEsteElemento(nombreEstancia,tv.getText().toString())) {
-                                    db.guardarElemento(nombreEstancia, tv.getText().toString(), 0);
-                                    ArrayList datosServidor = db.recuperarDatosServidor();
-                                    Conexion conexion = new Conexion(PlantillaLuces.this,"+B"+String.valueOf(posicion)+tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
-                                    conexion.execute();
-                                    adapterLuz.add(new Luz(imagen[0], tv.getText().toString(), "Apagada", false, nombreEstancia));
-                                    adapterLuz.notifyDataSetChanged();
-                                }else{
-                                    Toast.makeText(getApplicationContext(),"Ya existe un elemento con ese mismo nombre",Toast.LENGTH_LONG).show();
+                                    BDSqlite db = new BDSqlite(getApplicationContext());
+                                    db.iniciarBD();
+                                    db.abrirBD();
+                                    if (!db.existeEsteElemento(nombreEstancia, tv.getText().toString())) {
+                                        db.guardarElemento(nombreEstancia, tv.getText().toString(), 0);
+                                        ArrayList datosServidor = db.recuperarDatosServidor();
+                                        Conexion conexion = new Conexion(PlantillaLuces.this, "+B" + String.valueOf(posicion) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                                        conexion.execute();
+                                        adapterLuz.add(new Luz(imagen[0], tv.getText().toString(), "Apagada", false, nombreEstancia));
+                                        adapterLuz.notifyDataSetChanged();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Ya existe un elemento con ese mismo nombre", Toast.LENGTH_LONG).show();
+                                    }
+                                    db.cerrarBD();
+                                }else {
+                                    Toast.makeText(getApplicationContext(),"No has escrito ningún nombre para la bombilla seleccionada",Toast.LENGTH_LONG).show();
                                 }
-                                db.cerrarBD();
                             }else{
-                                Toast.makeText(getApplicationContext(),"No has seleccionado un elemento",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(),"No has seleccionado ninguna bombilla",Toast.LENGTH_LONG).show();
                         }
                         }
                     });
@@ -188,7 +187,6 @@ public class PlantillaLuces extends AppCompatActivity {
                             conexion.execute();
                             db.cerrarBD();
                             adapterLuz.remove(adapterLuz.getItem(info.position));
-                            contador--;
                         }
                     });
                     builderDelete.show();
@@ -246,13 +244,11 @@ public class PlantillaLuces extends AppCompatActivity {
         return super.onContextItemSelected(item);
     }
 
-    public void actualizarVista(boolean contadores){
+    public void actualizarVista(){
         BDSqlite db = new BDSqlite(getApplicationContext());
         db.iniciarBD();
         db.abrirBD();
         for(int i=0;i<db.numeroElementos(nombreEstancia);i++){
-            if(contadores)
-                contador++;
             ArrayList fila = db.recuperarElemento(i,nombreEstancia);
             String texto = "Apagada";
             Boolean estado = false;

@@ -60,7 +60,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 db.abrirBD();
                 Toast.makeText(getApplicationContext(),String.valueOf(db.numeroEstancias()),Toast.LENGTH_SHORT).show();
                 adapter.clear();
-                actualizarVista(true);
+                actualizarVista();
                 db.cerrarBD();
             }
         };
@@ -72,7 +72,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         recepcionSocket = RecepcionSocket.getInstance(this, handler);
         if(recepcionSocket.getSocket()==null || recepcionSocket.getSocket().isClosed()) {
             if (!datosServidor.get(0).toString().equals("IP")) {
-                Toast.makeText(getApplicationContext(),datosServidor.get(0).toString(),Toast.LENGTH_LONG).show();
                 Thread hilo = new Thread(recepcionSocket);
                 hilo.start();
             } else {
@@ -80,7 +79,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         }
 
-        actualizarVista(false);
+        actualizarVista();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -171,23 +170,24 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             BDSqlite db = new BDSqlite(getApplicationContext());
                             db.iniciarBD();
                             db.abrirBD();
-                            tv.setText(tv.getText() + String.valueOf(db.recuperarContador(imagen[1]) + 1));
                             if (input.getText().length() > 0) {
                                 tv.setText(input.getText().toString());
-                            }
-                            if (!db.existeEstaEstancia(tv.getText().toString())) {
-                                adapter.add(new Habitacion(imagen[0], tv));
-                                db.guardarEstancia(imagen[1], tv.getText().toString());
-                                db.guardarContador(imagen[1], db.recuperarContador(imagen[1]) + 1);
-                                ArrayList datosServidor = db.recuperarDatosServidor();
-                                if (recepcionSocket.getSocket().isConnected() && !recepcionSocket.getSocket().isClosed()) {
-                                    Conexion conexion = new Conexion(Home.this, "+E" + String.valueOf(imagen[1]) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
-                                    conexion.execute();
+                                if (!db.existeEstaEstancia(tv.getText().toString())) {
+                                    adapter.add(new Habitacion(imagen[0], tv));
+                                    db.guardarEstancia(imagen[1], tv.getText().toString());
+                                    db.guardarContador(imagen[1], db.recuperarContador(imagen[1]) + 1);
+                                    ArrayList datosServidor = db.recuperarDatosServidor();
+                                    if (recepcionSocket.getSocket().isConnected() && !recepcionSocket.getSocket().isClosed()) {
+                                        Conexion conexion = new Conexion(Home.this, "+E" + String.valueOf(imagen[1]) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
+                                        conexion.execute();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "No intenta enviar el mensaje", Toast.LENGTH_LONG).show();
+                                    }
                                 } else {
-                                    Toast.makeText(getApplicationContext(), "No intenta enviar el mensaje", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), "Ya existe una estancia con ese mismo nombre", Toast.LENGTH_LONG).show();
                                 }
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Ya existe una estancia con ese mismo nombre", Toast.LENGTH_LONG).show();
+                            }else{
+                                Toast.makeText(getApplicationContext(), "No has escrito ningún nombre para la estancia seleccionada", Toast.LENGTH_LONG).show();
                             }
                             db.cerrarBD();
                         } else {
@@ -270,7 +270,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 case R.id.changeName:
                     AlertDialog.Builder dialogChangeName = new AlertDialog.Builder(this);
                     dialogChangeName.setTitle("Nombre de la estancia");
-                    boolean insercionCorrecta = false;
                     final EditText input = new EditText(this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     input.setHint("Nombre");
@@ -379,18 +378,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return true;
     }
 
-    public void actualizarVista(boolean contadores){
+    public void actualizarVista(){
         BDSqlite db = new BDSqlite(getApplicationContext());
         db.iniciarBD();
         db.abrirBD();
-        //Toast.makeText(getApplicationContext(),"ENTRA ANTES",Toast.LENGTH_SHORT).show();
         if(db.numeroEstancias()!=0)
-            //Toast.makeText(getApplicationContext(),"ENTRA DESPUES",Toast.LENGTH_SHORT).show();
             for(int i = 0; i < db.numeroEstancias();i++){
                 ArrayList fila = db.recuperarEstancia(i);
                 TextView tv = new TextView(getApplicationContext());
-                if(contadores)
-                    db.guardarContador(Integer.valueOf(fila.get(0).toString()), db.recuperarContador(Integer.valueOf(fila.get(0).toString())) + 1);
                 switch(Integer.valueOf(fila.get(0).toString())){
                     case 0:
                         tv.setText(fila.get(1).toString());

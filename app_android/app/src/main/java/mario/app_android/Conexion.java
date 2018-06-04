@@ -43,25 +43,10 @@ public class Conexion extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                //long entrada = System.currentTimeMillis();
-                //socket = new Socket(ip, puerto);
-                    /*socket = new Socket();
-                    socket.connect(new InetSocketAddress(ip,puerto),5000);*/
                 socket = RecepcionSocket.getInstance(context,null).getSocket();
                 printWriter = new PrintWriter(socket.getOutputStream());
                 printWriter.write(mensaje);
                 printWriter.flush();
-
-                //recibe respuesta del servidor y formatea a String
-                    /*InputStream stream = socket.getInputStream();
-                    byte[] lenBytes = new byte[256];
-                    stream.read(lenBytes, 0, 256);
-                    String received = new String(lenBytes, "UTF-8").trim();*/
-
-                //cierra conexion
-                //socket.close();
-                //return received;
-                //return "Se ha enviado con éxito";
             } catch (UnknownHostException ex) {
                 Toast.makeText(context,"Servidor inalcanzable",Toast.LENGTH_SHORT);
             } catch (SocketTimeoutException ex){
