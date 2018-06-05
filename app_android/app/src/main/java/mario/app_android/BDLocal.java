@@ -38,10 +38,6 @@ public interface BDLocal {
 
     public void cambiarEstado(String estancia, String nombre, int estado);
 
-    public void guardarContador(int id, int valor);
-
-    public int recuperarContador(int id);
-
     public boolean existeEstaEstancia(String nombre);
 
     public boolean existeEsteElemento(String estancia, String nombre);

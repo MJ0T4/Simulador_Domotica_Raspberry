@@ -26,22 +26,11 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
         db.execSQL("CREATE TABLE estancias(id INTEGER, nombre TEXT PRIMARY KEY)");
         db.execSQL("CREATE TABLE IF NOT EXISTS datosServidor(id INTEGER, ip TEXT, puerto INTEGER)");
         db.execSQL("CREATE TABLE elementos(estancia TEXT, nombre TEXT, estado INTEGER)");
-        db.execSQL("CREATE TABLE contadores(id INTEGER, valor INTEGER)");
         ContentValues valores = new ContentValues();
         valores.put("id", 0);
         valores.put("ip","IP");
         valores.put("puerto",8888);
         db.insert("datosServidor",null, valores);
-        valores = new ContentValues();
-        valores.put("id",0);
-        valores.put("valor",0);
-        db.insert("contadores",null,valores);
-        valores.put("id",1);
-        db.insert("contadores",null,valores);
-        valores.put("id",2);
-        db.insert("contadores",null,valores);
-        valores.put("id",3);
-        db.insert("contadores",null,valores);
     }
 
     @Override
@@ -100,7 +89,6 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
     public void borrarBD() {
         db.execSQL("DROP TABLE IF EXISTS estancias");
         db.execSQL("DROP TABLE IF EXISTS elementos");
-        db.execSQL("DROP TABLE IF EXISTS contadores");
         onCreate(db);
     }
 
@@ -195,23 +183,6 @@ public class BDSqlite extends SQLiteOpenHelper implements BDLocal {
         String [] args = new String [] {nombre, estancia};
         valores.put("estado", estado);
         db.update("elementos",valores,"nombre=? AND estancia=?",args);
-    }
-
-    @Override
-    public void guardarContador(int id, int valor) {
-        ContentValues valores = new ContentValues();
-        String [] args = new String [] {String.valueOf(id)};
-        valores.put("valor",valor);
-        db.update("contadores",valores,"id=?",args);
-    }
-
-    @Override
-    public int recuperarContador(int id) {
-        String [] columnas = new String []{"valor"};
-        String [] args = new String [] {String.valueOf(id)};
-        Cursor cursor = this.db.query("contadores",columnas,"id=?",args,null,null,null);
-        cursor.moveToFirst();
-        return cursor.getInt(cursor.getColumnIndex("valor"));
     }
 
     @Override
