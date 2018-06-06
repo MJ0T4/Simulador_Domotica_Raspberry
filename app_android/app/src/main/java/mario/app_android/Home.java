@@ -175,7 +175,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 if (!db.existeEstaEstancia(tv.getText().toString())) {
                                     adapter.add(new Habitacion(imagen[0], tv));
                                     db.guardarEstancia(imagen[1], tv.getText().toString());
-                                    db.guardarContador(imagen[1], db.recuperarContador(imagen[1]) + 1);
                                     ArrayList datosServidor = db.recuperarDatosServidor();
                                     if (recepcionSocket.getSocket().isConnected() && !recepcionSocket.getSocket().isClosed()) {
                                         Conexion conexion = new Conexion(Home.this, "+E" + String.valueOf(imagen[1]) + tv.getText().toString(), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
@@ -237,20 +236,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             BDSqlite db = new BDSqlite(getApplicationContext());
                             db.iniciarBD();
                             db.abrirBD();
-                            switch (((Habitacion) adapter.getItem(info.position)).getImagenHabitacion()) {
-                                case R.drawable.cama:
-                                    db.guardarContador(0, db.recuperarContador(0) - 1);
-                                    break;
-                                case R.drawable.salon:
-                                    db.guardarContador(1, db.recuperarContador(1) - 1);
-                                    break;
-                                case R.drawable.cocina:
-                                    db.guardarContador(2, db.recuperarContador(2) - 1);
-                                    break;
-                                case R.drawable.wc:
-                                    db.guardarContador(3, db.recuperarContador(3) - 1);
-                                    break;
-                            }
                             db.eliminarEstancia(((Habitacion) adapter.getItem(info.position)).getTv().getText().toString());
                             ArrayList datosServidor = db.recuperarDatosServidor();
                             Conexion conexion = new Conexion(Home.this, "-E" + String.valueOf(info.position), datosServidor.get(0).toString(), Integer.valueOf(datosServidor.get(1).toString()));
