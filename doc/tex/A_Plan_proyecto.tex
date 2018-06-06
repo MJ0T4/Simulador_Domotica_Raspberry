@@ -2,12 +2,187 @@
 
 \section{Introducción}
 
+Para llevar acabo este proyecto he seguido una metodología llamada \textit{Top-down}. 
+En el modelo \textit{Top-down} se formula un resumen del sistema, sin especificar detalles. Cada parte del sistema se refina diseñando con mayor detalle. Cada parte nueva es entonces redefinida, cada vez con mayor detalle, hasta que la especificación completa es lo suficientemente detallada para validar el modelo \cite{wiki:topdown}. Teniendo como base lo anterior, la planificación que se ha seguido ha sido marcar por parte de mi tutor desde un principio los requisitos generales tanto funcionales como no funcionales que debería tener el sistema. Y a partir de esto, yo por mi parte crear requisitos a más bajo nivel según trataba de implementar sus requisitos.
+
 \section{Planificación temporal}
+
+En cuanto a la planificación temporal de este proyecto, no ha sido realizada por semanas, sino de la siguiente manera:
+
+\begin{enumerate}
+	\item El primer día quedé con mi tutor, y el me explicó que se esperaba del proyecto y que debería tener de cara a su exposición. De esta manera elaboramos unos requisitos generales.
+	\item A partir de estos requisitos generales, siguiendo la metodología \textit{Top-down}, yo mismo cree requisitos más detallados y más pequeños que me llevarían a la implementación de los requisitos generales.
+	\item Cada vez que se consiguiese un requisito general de los elaborados, se realizaría  una reunión en la que se mostraría el contenido en cuanto a código y funcionalidad de dicho requisito.
+	\item En dicha reunión, se exponen mejoras estéticas o de funcionalidad para dicho requisito, ya que a primera vista son muy generales, y nos enfocamos hacia el siguiente.
+\end{enumerate}
+
+Durante la realización del proyecto se han ido siguiendo los pasos anteriores, y no se ha realizado una planificación semanal, ya que cada reunión dependía de cada requisito. Además es posible que un requisito pudiese estar resuelto en una semana, pero otro en dos, o incluso tres semanas, dependiendo de la complejidad.
+
+A partir de los objetivos fijados, como planificación \textit{Top-down} elaboré una serie de tareas más sencillas para ir realizando y conseguir cumplir dichos objetivos. Estas son las tareas que me propuse para cumplir los objetivos y mantener cierta planificación temporal en el proyecto.
+
+\begin{itemize}
+	\item \textbf{Definir una habitación y los elementos a controlar.} 
+	\begin{enumerate}
+		\item Crear una \textit{Activity} o ventana principal que contendrá las estancias \footnote{estancias: posibles lugares de la casa: \textit{Habitación}, \textit{Salón}, \textit{Cocina}, \textit{Baño}}.
+		\item Crear un botón para poder crear las estancias dinámicamente.
+		\item Buscar una estructura para almacenar estancias en la que se permita la inserción, modificación y eliminación de ellas.
+		\item Implementar la funcionalidad del botón.
+		\item Crear una estructura personalizada para adaptarla a nuestras necesidades.
+		\item Diferenciar a la hora de la inserción que tipo de estancia estamos insertando mediante una lista de opción única.
+		\item Añadir imágenes de las diferentes estancias para que sea más visual al usuario saber que tipo de estancias ha creado.
+		\item Añadir un menú contextual en la estructura que permita modificar el nombre de la estancia o su eliminación.
+	\end{enumerate}
+	\item \textbf{Conexión con la estación.}
+	\begin{enumerate}
+		\item Buscar información sobre como realizar la conexión.
+		\item Implementar una conexión saliente mediante \textit{Sockets}.
+		\item Implementar dicha conexión en una tarea asíncrona para mejorar su funcionalidad.
+		\item Añadir dicha funcionalidad cuando se creen nuevas estancias o se modifiquen las ya existentes de alguna manera.
+	\end{enumerate}
+	\item \textbf{Incremento de la funcionalidad de la aplicación.}
+	\begin{enumerate}
+		\item Crear una \textit{Activity} o ventana secundaria donde se representará la iluminación.
+		\item Crear un botón para poder crear las bombillas dinámicamente.
+		\item Buscar una estructura para almacenar dichas bombillas en la que se permite la inserción, modificación y eliminación de ellas.
+		\item Implementar la funcionalidad del botón.
+		\item Crear una estructura personalizada para adaptarla a las necesidades de la bombilla.
+		\item Implementar la funcionalidad del interruptor para cambiar el estado de la bombilla.
+		\item Añadir un menú contextual en la estructura que contiene las bombillas que permite modificar el nombre de ellas y su eliminación.
+		\item Permitir que se realice una conexión a la estación con la creación de nuevas bombillas o que se modifiquen las ya existentes de alguna manera.
+		\item Añadir flecha de retroceso que nos devuelva a la ventana principal.
+		\item Permitir que al pulsar sobre una estancia nos dirija a su ventana secundaria con su iluminación correspondiente.
+	\end{enumerate}
+	\item \textbf{Desarrollo de la interfaz en la Raspberry Pi.}
+	\begin{enumerate}
+		\item Crear una ventana básica vacía.
+		\item Buscar una estructura en la que poder almacenar de forma visual las estancias y su iluminación.
+		\item Crear la estructura donde se almacenarán.
+		\item Añadir funcionalidad a la estructura para que permita la modificación y eliminación de las estancias y su iluminación.
+		\item Crear el servidor socket para escuchar los mensajes de la aplicación.
+		\item Crear un método que interprete los mensajes que llegan de la app.
+		\item Separar el servidor socket en un hilo independiente.
+		\item Añadir texto e imágenes en la parte de iluminación.
+		\item Añadir iconos a la estancias para diferencias cada tipo.
+		\item Añadir persistencia de los elementos.
+		\item Añadir la introducción de la IP del servidor de forma gráfica.
+		\item Modificar el servidor para que permita la conexión de más de un usuario simultáneamente.
+	\end{enumerate}
+	\item \textbf{Mejora de utilización de la aplicación.}
+	\begin{enumerate}
+		\item Crear una \textit{Activity} o ventana donde se representará la \textit{ip}, el \textit{puerto} y el \textit{estado} del servidor.
+		\item Permitir la conexión y desconexión del servidor desde esta ventana mediante un botón.
+		\item Mantener la persistencia de los elementos de la aplicación mediante una base de datos local.
+		\item Permitir borrar la base de datos desde el menú desplegable de la ventana principal.
+		\item Permitir acceder a la ventana del Servidor desde el menú desplegable de la ventana principal.
+		\item No permitir realizar cambios de ningún tipo sin estar conectado al servidor.
+		\item Crear un hilo independiente que escuche los cambios que nos manda el servidor.
+		\item Actualizar la vista con cada cambio que nos llegue del servidor.
+		\item Actualizar la base de datos local con la base de datos del servidor cada vez que nos conectemos a él.
+	\end{enumerate}
+	\item \textbf{Lanzamiento de la primera versión completamente funcional.}
+	\begin{enumerate}
+		\item Realizar pruebas manuales de todos los aspectos de la aplicación.
+		\item Poner a prueba que su funcionamiento es correcto con 3 usuarios conectados a la vez.
+		\item Realizar test instrumentales de la base de datos en la parte de la aplicación.
+	\end{enumerate}
+\end{itemize}
 
 \section{Estudio de viabilidad}
 
+Para el estudio de la viabilidad he decidido crear un análisis \textit{DAFO}, que es una herramienta de estudio de la situación de una empresa, institución, proyecto o persona, analizando sus características internas (Debilidades y Fortalezas) y su situación externa (Amenazas y Oportunidades) en una matriz cuadrada \cite{wiki:dafo}.
+
+\subsection{Debilidades}
+
+\begin{itemize}
+	\item Es un simulador de una vivienda inteligente, no está llevado a la realidad.
+	\item No es posible que funcione si la Raspberry y el terminal Android están conectado a una red diferente.
+	\item Solo hemos tratado el tema de la iluminación de la vivienda, quedan muchos aspectos de ella sin tratar.
+\end{itemize}
+
+\subsection{Fortalezas}
+
+\begin{itemize}
+	\item Código Python reutilizable en cualquier otro sistema operativo, ya que python es un lenguaje multiplataforma.
+	\item Permite el uso de varios usuarios simultáneamente.
+	\item El hardware utilizado es barato.
+\end{itemize}
+
+\subsection{Amenazas}
+
+\begin{itemize}
+	\item Ya existen viviendas inteligentes en la realidad.
+	\item Actualmente, empresas como Xiaomi están sacando bombillas inteligentes que suprimirían el intermediario del servidor. La conexión sería directa con la bombilla porque contiene su propia conexión a Internet.
+\end{itemize}
+
+\subsection{Oportunidades}
+
+\begin{itemize}
+	\item El mercado de la domótica aún está comenzando y tal vez no sea tan complicado hacerse un hueco como en otros mercados.
+	\item Están sacando al mercado placas con mayor potencia que la Raspberry Pi, como por ejemplo, la \textbf{ODROID-XU4} \cite{placa:odroid}.
+	\item Podemos mejorar la aplicación añadiendo más elementos de la vivienda que podemos controlar y centralizarlos todos desde la misma aplicación.
+\end{itemize}
+
 \subsection{Viabilidad económica}
+
+En cuanto a la viabilidad económica vamos a diferencia entre dos aspectos:
+
+\subsubsection{Coste Personal}
+
+Este proyecto ha sido desarrollado por un único desarrollador realizando aproximadamente 20 horas semanales de trabajo. Suponiendo que el sueldo de un desarrollador a tiempo parcial es de 15 euros por hora.
+
+\verb|4 semanas/mes x 15 euros/hora = 1200 euros por mes|
+
+Teniendo en cuenta que el proyecto ha sido realizado durante los meses \textit{Marzo}, \textit{Abril} y \textit{Mayo}:
+
+\verb|3 meses x 1200 euros/mes = 3600 euros|
+
+El coste total a pagar al desarrollador del proyecto serían 3600 \euro.
+
+Para el cálculo del salario del desarrollador no se ha tenido en cuenta ningún tipo de retención porque el proyecto no ha sido realizado en una empresa. En cambio, debemos añadir costes de vivienda como son la luz y el internet. El gasto de vivienda al residir en un piso compartido de tres personas se reduce a la tercera parte.
+
+El gasto de luz es:
+
+\verb|3 meses x (60 euros/mes / 3 personas) = 60 euros|
+
+El gasto de internet es:
+
+\verb|3 meses x (35 euros/mes / 3 personas) = 35 euros|
+
+El gasto total del coste personal siguiendo la tabla \ref{tabla:costePersonal} es:
+
+\verb|Sueldo desarrollador + internet + luz = 3600 + 35 + 60 = 3695 euros|
+\newpage
+
+\tablaSmallSinColores{Coste personal.}{l c c c c}{costePersonal}
+{ \multicolumn{1}{l}{\textbf{Nombre}} & \textbf{Precio (\euro)} \\}{
+	Luz & 60 \\
+	Internet & 35 \\
+	Desarrollador & 3600 \\
+}
+
+\subsubsection{Coste Hardware}
+Para este proyecto, no he necesitado comprar ningún hardware adicional porque ya disponía de él. Por ello mostraré un precio aproximado del coste de estos elementos.
+
+El coste total del hardware siguiendo la tabla \ref{tabla:costeHardware} es 1083 \euro.
+
+\tablaSmallSinColores{Coste aproximado del Hardware.}{l c c c c}{costeHardware}
+{ \multicolumn{1}{l}{\textbf{Hardware}} & \textbf{Precio (\euro)} \\}{
+	Raspberry Pi & 35 \\
+	Tarjeta Micro SD 64 GB Sandisk & 22 \\
+	Rii Mini i8 (Teclado + Ratón) & 14 \\
+	Ordenador Portátil & 1000 \\
+	Enchufe + Cable USB-Micro USB & 7 \\
+	Carcasa Raspberry Pi & 5 \\
+}
+
+El coste total del proyecto ha sido:
+
+\verb|Coste personal + Coste Hardware = 3695 + 1083 = 4778 euros|
 
 \subsection{Viabilidad legal}
 
+Las herramientas utilizadas en este proyecto son \textit{JetBrains Pycharm} y \textit{Android Studio}. \\
+\textbf{Android Studio} está basado en el software \textit{IntelliJ IDEA} de \textbf{JetBrains} y ha sido publicado de forma gratuita a través de la Licencia Apache 2.0.
 
+\textbf{JetBrains PyCharm Community Edition} ha sido publicado gratuitamente a través de la licencia Apache, aunque en este proyecto he usado \textbf{Jetbrains PyCharm Professional Edition} a través de una licencia de estudiante de manera gratuita también.\\
+No ha sido necesario dar crédito o pagar por ninguna de las librerías utilizadas en este proyecto.

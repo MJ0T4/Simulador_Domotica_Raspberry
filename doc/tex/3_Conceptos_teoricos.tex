@@ -1,87 +1,34 @@
 \capitulo{3}{Conceptos teóricos}
 
-En aquellos proyectos que necesiten para su comprensión y desarrollo de unos conceptos teóricos de una determinada materia o de un determinado dominio de conocimiento, debe existir un apartado que sintetice dichos conceptos.
+Para el correcto entendimiento de este trabajo va a ser necesario explicar o aclarar varios términos de los que se va a hablar.
 
-Algunos conceptos teóricos de \LaTeX \footnote{Créditos a los proyectos de Álvaro López Cantero: Configurador de Presupuestos y Roberto Izquierdo Amo: PLQuiz}.
+\section{Domótica}
 
-\section{Secciones}
-
-Las secciones se incluyen con el comando section.
+La domótica \cite{cedom:domotica} es el conjunto de tecnologías aplicadas al control y la automatización inteligente de la vivienda, que permite una gestión eficiente del uso de la energía, que aporta seguridad y confort, además de comunicación entre el usuario y el sistema. \\
+Este concepto es importante para este proyecto porque estamos tratando de imitar una vivienda inteligente, aunque solo tratemos la parte de su iluminación y la comunicación entre el usuario y el sistema. 
 
 \section{Internet de las cosas (IoT)}
 
-Se ha encontrado en \cite{wiki:Internet_de_las_cosas}
+Internet de las cosas (Internet of Things) \cite{wiki:iot} es un concepto que se refiere a la interconexión digital de objetos cotidianos con Internet. Alternativamente, Internet de las cosas es la conexión de Internet con más "cosas y objetos" que personas. \\
+Quería aclarar este concepto, porque en este trabajo a pesar de usar un servidor como centralita que maneja tu iluminación, actualmente muchas empresas están creando bombillas que contienen su propia conexión a Internet y que pueden ser manejadas a través de una aplicación de móvil.
 
-\subsection{Subsecciones}
+\section{Android}
 
-Además de secciones tenemos subsecciones.
+Android \cite{wiki:android} es un sistema operativo basado en un núcleo Linux. Fue diseñado principalmente para dispositivos móviles con pantalla táctil, como teléfonos inteligentes, tabletas y también para relojes inteligentes, televisores y automóviles.
+La aplicación a desarrollar en este trabajo está enfocada a este sistema operativo, ya que actualmente es el sistema operativo móvil más utilizado del mundo.
 
-\subsubsection{Subsubsecciones}
+\section{Python}
 
-Y subsecciones. 
+Python \cite{wiki:python} es un lenguaje de programación interpretado cuya filosofía hace hincapié en una sintaxis que favorezca un código legible.\\
+Se trata de un lenguaje de programación multiparadigma, ya que soporta orientación a objetos, programación imperativa y, en menor medida, programación funcional. Es un lenguaje interpretado, usa tipado dinámico y es multiplataforma.\\
+De todo lo anterior, que es una breve explicación de Python, nos interesa la idea de que sea \textit{multiplataforma}, ya que nos ofrece la posibilidad de ser ejecutado en el sistema operativo Raspbian de una Raspberry Pi, o por ejemplo en un sistema operativo Windows de un ordenador de sobremesa.
 
+\section{Interfaz gráfica (GUI)}
 
-\section{Referencias}
+La interfaz gráfica de usuario, conocida también como GUI (del inglés graphical user interface) \cite{wiki:gui}, es un programa informático que actúa de interfaz de usuario, utilizando un conjunto de imágenes y objetos gráficos para representar la información y acciones disponibles en la interfaz. Su principal uso, consiste en proporcionar un entorno visual sencillo para permitir la comunicación con el sistema operativo de una máquina o computador. \\
+En este trabajo, tanto la parte de la aplicación móvil como la de la Raspberry Pi, contarán con una interfaz gráfica. De hecho, todas las aplicaciones Android trabajan de forma gráfica, ya que el usuario no ve su código mientras las maneja. En cambio, la parte de Python 3 en la Raspberry no tiene por qué tener interfaz gráfica y puede ser manejada mediante una terminal. Pero para hacer más cómodo y visible el estado de la casa al usuario, he utilizado la librería \textit{Tkinter} de Python para crear una interfaz gráfica.
 
-Las referencias se incluyen en el texto usando cite \cite{wiki:latex}. Para citar webs, artículos o libros \cite{koza92}.
+\section{Tkinter}
 
-
-\section{Imágenes}
-
-Se pueden incluir imágenes con los comandos standard de \LaTeX, pero esta plantilla dispone de comandos propios como por ejemplo el siguiente:
-
-\imagen{escudoInfor}{Autómata para una expresión vacía}
-
-
-
-\section{Listas de items}
-
-Existen tres posibilidades:
-
-\begin{itemize}
-	\item primer item.
-	\item segundo item.
-\end{itemize}
-
-\begin{enumerate}
-	\item primer item.
-	\item segundo item.
-\end{enumerate}
-
-\begin{description}
-	\item[Primer item] más información sobre el primer item.
-	\item[Segundo item] más información sobre el segundo item.
-\end{description}
-	
-\begin{itemize}
-\item 
-\end{itemize}
-
-\section{Tablas}
-
-Igualmente se pueden usar los comandos específicos de \LaTeX o bien usar alguno de los comandos de la plantilla.
-
-\tablaSmall{Herramientas y tecnologías utilizadas en cada parte del proyecto}{l c c c c}{herramientasportipodeuso}
-{ \multicolumn{1}{l}{Herramientas} & App AngularJS & API REST & BD & Memoria \\}{ 
-HTML5 & X & & &\\
-CSS3 & X & & &\\
-BOOTSTRAP & X & & &\\
-JavaScript & X & & &\\
-AngularJS & X & & &\\
-Bower & X & & &\\
-PHP & & X & &\\
-Karma + Jasmine & X & & &\\
-Slim framework & & X & &\\
-Idiorm & & X & &\\
-Composer & & X & &\\
-JSON & X & X & &\\
-PhpStorm & X & X & &\\
-MySQL & & & X &\\
-PhpMyAdmin & & & X &\\
-Git + BitBucket & X & X & X & X\\
-Mik\TeX{} & & & & X\\
-\TeX{}Maker & & & & X\\
-Astah & & & & X\\
-Balsamiq Mockups & X & & &\\
-VersionOne & X & X & X & X\\
-} 
+\textit{Tkinter} \cite{wiki:tk} forma parte de la biblioteca gráfica Tcl/Tk para el lenguaje de programación Python. Se considera estándar de la interfaz de usuario Python, debido a que viene con su instalación y no es necesario la instalación de librerías externas.
+Y a pesar de haber otras alternativas como wxPython, PyQt o PySide y PyGTK, he preferido usar esta. 

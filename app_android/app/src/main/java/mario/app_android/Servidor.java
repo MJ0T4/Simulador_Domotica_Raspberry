@@ -1,11 +1,8 @@
 package mario.app_android;
 
-import android.opengl.GLException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -63,8 +60,6 @@ public class Servidor extends AppCompatActivity {
                     tvEstado.setTextColor(getResources().getColor(R.color.colorGreen));
                     btConectar.setVisibility(View.INVISIBLE);
                     btDesconectar.setVisibility(View.VISIBLE);
-                }else{
-                    Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
                 }
             }
         };

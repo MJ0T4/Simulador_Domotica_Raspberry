@@ -1,6 +1,53 @@
 \capitulo{4}{Técnicas y herramientas}
 
-Esta parte de la memoria tiene como objetivo presentar las técnicas metodológicas y las herramientas de desarrollo que se han utilizado para llevar a cabo el proyecto. Si se han estudiado diferentes alternativas de metodologías, herramientas, bibliotecas se puede hacer un resumen de los aspectos más destacados de cada alternativa, incluyendo comparativas entre las distintas opciones y una justificación de las elecciones realizadas. 
-No se pretende que este apartado se convierta en un capítulo de un libro dedicado a cada una de las alternativas, sino comentar los aspectos más destacados de cada opción, con un repaso somero a los fundamentos esenciales y referencias bibliográficas para que el lector pueda ampliar su conocimiento sobre el tema.
+\section {Técnicas}
 
+En cuanto al trabajo he seguido una metodología o técnica \textit{Top-down}, porque es la que más se adaptaba a mi forma de trabajar y con la que más cómodo me sentía, por ejemplo, respecto a una metodología \textit{SCRUM}.
+He intentado llevar un seguimiento de mi trabajo en la plataforma \textit{GitHub}, pero el seguimiento real lo he realizado por escrito en una pizarra día a día y subiendo a GitHub solo los cambios más importantes y completamente funcionales.
 
+\section {Herramientas}
+En este apartado voy a explicar brevemente cuáles son las herramientas que he utilizado para realización del trabajo.
+
+\section{Lenguajes de programación}
+
+\subsubsection{Python 3}
+
+Para la parte de la centralita domótica en Raspberry opté por Python 3 tras pensar sus ventajas respecto a otros. Los aspectos más relevantes para mi elección fueron que viene instalado por defecto con el sistema Raspbian, que es un lenguaje que tiene una sintaxis sencilla para su programación y por último, que es multiplaforma, que eso siempre viene bien en caso de migrar el código a otro sistema.\\
+Estuve también optando por realizar esta parte con Java y la interfaz gráfica con JavaFX, pero uno de los puntos fuertes que tenía Python 3 y Java no, es que viene preinstalado en el sistema y teniendo en cuenta que pretendemos que los usuarios no tengan que ser expertos en la materia, quería que fuese lo más sencillo posible para su instalación y ejecución.
+
+Una vez decidido el lenguaje de programación, la duda estaba en qué tecnología se usaría para la representación de la interfaz gráfica. Buscando por internet decidí usar la librería \textit{Tkinter} porque ya viene incluida en la mayoría de las instalaciones de Python. Estuve mirando como realizar interfaces gráficas con PyQt5, pero no está soportado en versiones superiores a Python 3.5 y actualmente en la Raspberry Pi estamos usando la versión 3.5.3. Además, PyQt5 funciona creando un fichero .pyw a parte de nuestro fichero .py, lo cual me parecía crear una estructura compleja e innecesaria de directorios, teniendo otras tecnologías más simples.
+
+Para la programación de la parte de Raspberry Pi en Python 3 he utilizado la herramienta \textit{Jetbrains Pycharm}.
+
+\subsection{Android}
+
+Para la programación de la aplicación que se usará en el smartphone, he decidido usar \textit{Android} frente \textit{IOS} porque la mayoría de los smartphone actualmente usan \textit{Android}. Además, ya tenía conocimientos básicos sobre la tecnología porque ya había realizado pequeñas aplicaciones antes.
+
+Este proyecto específico está programado con el nivel 23 de la API x86 enfocado para sistemas Lollypop 5.0 o superiores.
+
+Para la programación de la aplicación de este proyecto he utilizado la herramienta \textit{Android Studio} de la que hablaré a continuación. 
+
+\section{Herramientas de desarrollo de software}
+
+\subsection{JetBrains Pycharm (Python 3)}
+\textbf{\textit{Jetbrains Pycharm}} es un entorno de desarrollo o \textit{IDE} orientado hacía Python. He optado por esta herramienta y no por otra como por ejemplo \textit{Geany}, porque ya tenía experiencia en ella. Además de ayudar mucho con su autocompletado de código, nos ofrece muchas posibilidades con la instalación de plugíns. Estos plugins nos pueden servir, por ejemplo, para ayudarnos a ver el recubrimiento de código de los test que hemos realizado.
+
+\subsection{Android Studio (Android)}
+\textbf{\textit{Android Studio}} es otro entorno de desarrollo o \textit{IDE} enfocado al desarrollo de aplicaciones en Android. Además de ayudar mucho con su autocompletado como la anterior, también tenemos la opción de instalar plugins. Aunque lo que más me gustaría destacar de esta herramienta es la posibilidad de tener un \text{AVD} o \textit{Android Virtual Device}. Un \textbf{AVD} se podría entender como un emulador, es decir, podemos elegir entre diferentes tipos de dispositivos, como \textit{smartphone} o \textit{tablets}, y elegir la versión que deseas que se carge en ellos. Gracias a esto, tenemos la posibilidad de hacer funcionar nuestro código sobre un sistema de Android.
+
+Esta parte de la herramienta es la que más uso he dado en el desarrollo de software, ya sea para visualizar la ejecución de tu aplicación, como la ejecución de test instrumentales sobre el sistema Android. Para toda la realización del proyecto he utilizado un emulador del dispositivo \textbf{Nexus 5X} con un versión de sistema \textbf{Android Oreo 8.1} y con una API nivel 27.
+
+\section{Herramientas de control de versiones}
+
+\subsection{GitHub}
+
+\textbf{\textit{GitHub}} es una herramienta de control de versiones que nos ayuda a tener disponible nuestro código y ficheros en el repositorio en todo momento. Desde este repositorio podemos acceder a todos los ficheros subidos, y además en cada una de las versiones subidas, lo que nos ayuda a retroceder a una versión anterior en caso de pérdida o fallo. Para realizar de manera más sencilla la visualización de los cambios en el repositorio de trabajo y los tareas pendientes, he utilizado la herramienta de escritorio \textbf{\textit{GitHub Desktop}}. Con este herramienta, puedo seleccionar fácilmente que archivos deseo subir y realizar tareas básicas de \textit{Git} como \textbf{Pull} o \textbf{Push}.
+
+\subsection{ZenHub}
+\textbf{\textit{ZenHub}} es una herramienta para la gestión de las tareas de un proyecto y que está totalmente integrada con \textbf{GitHub}. Esta herramienta no está disponible desde la herramienta \textbf{GitHub Desktop}, pero si desde la web. Esta ha sido una de las herramientas para la planificación temporal y seguimiento del proyecto. Aunque me gustaría aclarar que las tareas diarias y seguimiento de ellas las he realizado a mano sobre un pizarra en la que podía hacer diagramas y dibujos que me han ayudado a su solución.
+
+\section{Herramientas de documentación}
+
+\subsection{\LaTeX}
+
+\textbf{\textit{Latex}} es una herramienta enfocada a la creación de documentos escritos que presenten una alta calidad tipográfica. La memoria y anexos de este proyecto han sido escritos con esta herramienta. Gracias a ella y a la plantilla proporcionada por la universidad solo hay que preocuparse de rellenar su contenido y nos olvidaremos de la problemática de su formateo. Esta herramienta frente a otros editores de texto como \textit{Word} tiene un período de adaptación más alto, pero que conlleva un mejor resultado final.

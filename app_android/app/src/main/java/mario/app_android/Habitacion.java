@@ -1,8 +1,5 @@
 package mario.app_android;
 
-import android.net.Uri;
-import android.text.style.ClickableSpan;
-import android.widget.Button;
 import android.widget.TextView;
 
 /**

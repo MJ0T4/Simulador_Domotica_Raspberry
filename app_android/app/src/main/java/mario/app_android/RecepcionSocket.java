@@ -1,12 +1,10 @@
 package mario.app_android;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,7 +98,7 @@ public class RecepcionSocket implements Runnable {
         return this.socket;
     }
 
-    public void actualizar(String mensaje) {
+    private void actualizar(String mensaje) {
         BDSqlite db = new BDSqlite(context);
         db.iniciarBD();
         db.abrirBD();

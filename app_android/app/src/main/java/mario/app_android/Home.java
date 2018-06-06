@@ -363,7 +363,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return true;
     }
 
-    public void actualizarVista(){
+    private void actualizarVista(){
         BDSqlite db = new BDSqlite(getApplicationContext());
         db.iniciarBD();
         db.abrirBD();

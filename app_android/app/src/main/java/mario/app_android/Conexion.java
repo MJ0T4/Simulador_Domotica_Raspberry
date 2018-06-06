@@ -2,9 +2,6 @@ package mario.app_android;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Looper;
-import android.support.v7.app.AlertDialog;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -15,7 +12,6 @@ import java.net.UnknownHostException;
 
 public class Conexion extends AsyncTask<Void, Void, Void> {
 
-        private AlertDialog progressDialog;
         private Context context;
         private String ip, mensaje;
         private int puerto;
@@ -27,17 +23,6 @@ public class Conexion extends AsyncTask<Void, Void, Void> {
             this.mensaje = mensaje;
             this.ip = ip;
             this.puerto = puerto;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            /*
-                progressDialog = new AlertDialog.Builder(context).create();
-                progressDialog.setTitle("Conectando al servidor");
-                progressDialog.setMessage("Por favor espere...");
-                progressDialog.setView(new ProgressBar(context));
-                progressDialog.show();*/
         }
 
         @Override
@@ -58,11 +43,4 @@ public class Conexion extends AsyncTask<Void, Void, Void> {
             }
             return null;
         }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            //progressDialog.dismiss();
-        }
-
-
 }

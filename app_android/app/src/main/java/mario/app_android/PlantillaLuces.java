@@ -31,7 +31,7 @@ public class PlantillaLuces extends AppCompatActivity {
     private String nombreEstancia;
     private int posicion;
     private RecepcionSocket recepcionSocket;
-    public Handler handler;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,6 @@ public class PlantillaLuces extends AppCompatActivity {
         handler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                Toast.makeText(getApplicationContext(),msg.getData().getString("Mensaje"),Toast.LENGTH_SHORT).show();
                 adapterLuz.clear();
                 actualizarVista();
             }
@@ -244,7 +243,7 @@ public class PlantillaLuces extends AppCompatActivity {
         return super.onContextItemSelected(item);
     }
 
-    public void actualizarVista(){
+    private void actualizarVista(){
         BDSqlite db = new BDSqlite(getApplicationContext());
         db.iniciarBD();
         db.abrirBD();

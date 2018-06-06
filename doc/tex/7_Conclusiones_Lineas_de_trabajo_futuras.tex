@@ -1,4 +1,40 @@
 \capitulo{7}{Conclusiones y Líneas de trabajo futuras}
 
-Todo proyecto debe incluir las conclusiones que se derivan de su desarrollo. Éstas pueden ser de diferente índole, dependiendo de la tipología del proyecto, pero normalmente van a estar presentes un conjunto de conclusiones relacionadas con los resultados del proyecto y un conjunto de conclusiones técnicas. 
-Además, resulta muy útil realizar un informe crítico indicando cómo se puede mejorar el proyecto, o cómo se puede continuar trabajando en la línea del proyecto realizado. 
+\section{Conclusiones} 
+
+Para este proyecto voy a hablar sobre conclusión a nivel de proyecto y a nivel personal.
+
+\subsection{A nivel de proyecto}
+A nivel de proyecto, al ser una idea que yo propuse esperaba más de el. Esperaba desarrollar todas o casi todas las líneas de trabajo de las que hablaré más adelante, pero que debido a problemas en el desarrollo o el tiempo no se han podido realizar. Aun así, ha sido un proyecto en el que la motivación y la ayuda de mi tutor ha sido fundamental para su desarrollo y estoy muy contento del resultado final.
+
+\subsection{A nivel personal}
+A nivel personal, este fue el primer proyecto que tuve en mente para realizar por mi cuenta, pero que gracias a mi tutor he podido desarrollar como mi trabajo final de carrera. Siempre me ha llamado la atención la interconexión entre los dispositivos, como lo consiguen y como es posible trabajar instantáneamente a grandes distancias. Por eso estoy muy contento de haber podido trabajar en un proyecto relacionado con este tema y poder ver de primera mano como se consigue que todo funcione.
+
+\section{Líneas de trabajo futuras}
+
+En este apartado vamos a tratar las líneas de trabajo futuras y los cambios que se podrían añadir para mejorar este proyecto.
+
+Primero nombraré las líneas futuras y cambios y luego hablaré brevemente sobre ellos.
+
+\begin{enumerate}
+	\item No tener que ser necesario estar conectado al mismo Wifi.
+	\item Añadir más elementos que poder controlar a las estancias.
+	\item Recepción de notificaciones cuando otro usuario haya realizado un cambio.
+	\item Añadir elementos generales de una casa como una lavadora o la calefacción.
+\end{enumerate}
+
+\subsection{Primera línea}
+
+Este es el mayor inconveniente del proyecto, y es que no es posible modificar el estado de tu casa fuera de ella. Ahora mismo el servidor de la Raspberry Pi se monta sobre una ip privada que solamente es accesible por los dispositivos conectados a esa misma red.
+No he conseguido poder montar el servidor sobre la ip pública y que de esta manera sea accesible desde otras redes. 
+La posible solución que barajé fue trabajar con la configuración \textbf{NAT} y con el redireccionamiento de puertos a través del firewall del router.
+
+\subsection{Segunda línea}
+
+En este proyecto me he centrado tanto en la conexión, visualización y correcta ejecución de todas las partes, que solo he podido añadir iluminación a la centralita domótica. No sería muy complicado añadir más elementos ya que el proyecto está enfocado a ello.
+
+\subsection{Tercera línea}
+Esta es una de esas líneas en la que ya he trabajado pero que pospuse para más adelante para trabajar con otras tecnologías. Con los conocimientos que yo tengo, conseguí recibir notificaciones, pero el problema es que la aplicación debe estar abierta para recibirlas. Esto es un problema importante, ya que la esencia de ello es que no tengas la aplicación abierta para recibirlas porque sino ya estarías viendo los cambios.
+
+\subsection{Cuarta línea}
+Añadir elementos como puede ser la calefacción y poder programar su encendido  y apagado son puntos que darían más nivel a un proyecto como este. Estos elementos generales que no pertenecen a una estancia específica deberían estar en el menú desplegable de la ventana principal, ya que desde ahí serían más accesibles.
